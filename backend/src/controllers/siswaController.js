@@ -1,4 +1,4 @@
-const { insertSiswa, getAllSiswa, getSiswaById } = require('../models/siswaModel');
+const { insertSiswa, getAllSiswa, getSiswaById , updateSiswa, deleteSiswa } = require('../models/siswaModel');
 
 const addSiswa = async (req, res) => {
   const { nisn, nama, rfid, jurusan, kelas, kelasParalel } = req.body;
@@ -33,4 +33,38 @@ const getSiswaByIdController = async (req, res) => {
   }
 };
 
-module.exports = { addSiswa, getSiswaList, getSiswaByIdController };
+// Update siswa berdasarkan ID
+const updateSiswaByID = async (req, res) => {
+  const { id } = req.params;
+  const { nisn, nama, rfid, jurusan, kelas, kelasParalel } = req.body;
+
+  try {
+    const updated = await updateSiswa(id, nisn, nama, rfid, jurusan, kelas, kelasParalel);
+    if (updated) {
+      res.json(updated);
+    } else {
+      res.status(404).send('❌ Siswa tidak ditemukan.');
+    }
+  } catch (err) {
+    res.status(500).send('❌ Gagal mengupdate siswa.');
+  }
+};
+
+// Hapus siswa berdasarkan ID
+const deleteSiswaByID = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deleted = await deleteSiswa(id);
+    if (deleted) {
+      res.json({ message: '✅ Siswa berhasil dihapus.', deleted });
+    } else {
+      res.status(404).send('❌ Siswa tidak ditemukan.');
+    }
+  } catch (err) {
+    res.status(500).send('❌ Gagal menghapus siswa.');
+  }
+};
+
+
+module.exports = { addSiswa, getSiswaList, getSiswaByIdController, updateSiswaByID,deleteSiswaByID };
