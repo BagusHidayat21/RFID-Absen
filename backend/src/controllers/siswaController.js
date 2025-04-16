@@ -1,9 +1,9 @@
 const { insertSiswa, getAllSiswa, getSiswaById , updateSiswa, deleteSiswa } = require('../models/siswaModel');
 
 const addSiswa = async (req, res) => {
-  const { nisn, nama, rfid, jurusan, kelas, kelasParalel } = req.body;
+  const { nisn, nama, rfid, jurusan, kelas, kelas_paralel } = req.body;
   try {
-    const newSiswa = await insertSiswa(nisn, nama, rfid, jurusan, kelas, kelasParalel);
+    const newSiswa = await insertSiswa(nisn, nama, rfid, jurusan, kelas, kelas_paralel);
     res.status(201).json(newSiswa);
   } catch (err) {
     res.status(500).send('Gagal menambahkan siswa');
@@ -36,10 +36,10 @@ const getSiswaByIdController = async (req, res) => {
 // Update siswa berdasarkan ID
 const updateSiswaByID = async (req, res) => {
   const { id } = req.params;
-  const { nisn, nama, rfid, jurusan, kelas, kelasParalel } = req.body;
+  const { nisn, nama, rfid, jurusan, kelas, kelas_paralel } = req.body;
 
   try {
-    const updated = await updateSiswa(id, nisn, nama, rfid, jurusan, kelas, kelasParalel);
+    const updated = await updateSiswa(id, nisn, nama, rfid, jurusan, kelas, kelas_paralel);
     if (updated) {
       res.json(updated);
     } else {

@@ -1,13 +1,13 @@
 const { pool } = require('../config/db');
 
 // Insert data siswa baru
-const insertSiswa = async (nisn, nama, rfid, jurusan, kelas, kelasParalel) => {
+const insertSiswa = async (nisn, nama, rfid, jurusan, kelas, kelas_paralel) => {
   const query = `
     INSERT INTO data_siswa (nisn, nama, rfid, jurusan, kelas, kelas_paralel)
     VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING *;
   `;
-  const values = [nisn, nama, rfid, jurusan, kelas, kelasParalel];
+  const values = [nisn, nama, rfid, jurusan, kelas, kelas_paralel];
 
   try {
     const result = await pool.query(query, values);
@@ -55,7 +55,7 @@ const getSiswaById = async (id) => {
 
 
 // Update siswa berdasarkan ID
-const updateSiswa = async (id, nisn, nama, rfid, jurusan, kelas, kelasParalel) => {
+const updateSiswa = async (id, nisn, nama, rfid, jurusan, kelas, kelas_paralel) => {
   const query = `
     UPDATE data_siswa
     SET nisn = $2,
@@ -67,7 +67,7 @@ const updateSiswa = async (id, nisn, nama, rfid, jurusan, kelas, kelasParalel) =
     WHERE id = $1
     RETURNING *;
   `;
-  const values = [id, nisn, nama, rfid, jurusan, kelas, kelasParalel];
+  const values = [id, nisn, nama, rfid, jurusan, kelas, kelas_paralel];
 
   try {
     const result = await pool.query(query, values);

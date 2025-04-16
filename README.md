@@ -1,6 +1,6 @@
 # 📡 Sistem Absensi RFID — Kolaborasi RPL x EI
 
-Sistem Absensi Berbasis RFID ini merupakan proyek kolaborasi antara **mahasiswa AM UM 2025** dan **SMK Negeri 1 Jenangan Ponorogo**. Tujuan dari proyek ini adalah menciptakan sistem absensi otomatis yang efisien menggunakan teknologi RFID.
+Sistem Absensi Berbasis RFID ini merupakan proyek kolaborasi antara **Mahasiswa AM UM 2025** dan **SMK Negeri 1 Jenangan Ponorogo**. Tujuan dari proyek ini adalah menciptakan sistem absensi otomatis yang efisien menggunakan teknologi RFID.
 
 - 🔧 Jurusan **EI (Elektronika Industri)**: Bertanggung jawab merancang dan merakit alat RFID.
 - 💻 Jurusan **RPL (Rekayasa Perangkat Lunak)**: Bertanggung jawab mengembangkan backend (Express.js), frontend (Next.js), dan database (PostgreSQL).
