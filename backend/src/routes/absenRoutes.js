@@ -1,12 +1,10 @@
-const express = require('express');
-const { addAbsen, getAbsenBySiswaIdController } = require('../controllers/absenController');
-
+const express = require("express");
 const router = express.Router();
 
-// Route untuk tambah absen
-router.post('/absen', addAbsen);
+const AbsenController = require("../controllers/absenController");
 
-// Route untuk mengambil absen berdasarkan siswa ID
-router.get('/absen/:id', getAbsenBySiswaIdController);
+router.get("/absen", AbsenController.getAllAbsen);
+router.get("/absen/:id", AbsenController.getAbsenById);
+router.post("/absen", AbsenController.addAbsen);
 
 module.exports = router;
