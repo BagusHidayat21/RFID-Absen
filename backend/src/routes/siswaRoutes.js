@@ -1,18 +1,13 @@
-const express = require('express');
-const { addSiswa, getSiswaList, getSiswaByIdController, updateSiswaByID, deleteSiswaByID } = require('../controllers/siswaController');
-
+const express = require("express");
 const router = express.Router();
 
-// Route untuk tambah siswa
-router.post('/siswa', addSiswa);
+const SiswaController = require("../controllers/siswaController");
 
-// Route untuk mengambil semua siswa
-router.get('/siswa', getSiswaList);
 
-// Route untuk mengambil siswa berdasarkan ID
-router.get('/siswa/:id', getSiswaByIdController);
-
-router.put('/siswa/:id', updateSiswaByID);    // 🔧 Update
-router.delete('/siswa/:id', deleteSiswaByID); // 🗑️ Delete
+router.get("/siswa",  SiswaController.getAllSiswa);
+router.get("/siswa/:id",  SiswaController.getSiswaById);
+router.post("/siswa",  SiswaController.createSiswa);
+router.put("/siswa/:id",  SiswaController.updateSiswa);
+router.delete("/siswa/:id",  SiswaController.deleteSiswa);
 
 module.exports = router;

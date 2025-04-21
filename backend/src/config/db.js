@@ -19,7 +19,7 @@ const setupDatabase = async () => {
       DO $$
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'jurusan_enum') THEN
-          CREATE TYPE jurusan_enum AS ENUM ('RPL', 'EI', 'OI', 'DBIB', 'TKP', 'TSM', 'TPM', 'TLAS', 'TPTUP');
+          CREATE TYPE jurusan_enum AS ENUM ('RPL', 'EI', 'OI', 'DPIB', 'TKP', 'TSM', 'TPM', 'TLAS', 'TPTUP');
         END IF;
       END$$;
     `);

@@ -1,70 +1,72 @@
-const { insertSiswa, getAllSiswa, getSiswaById , updateSiswa, deleteSiswa } = require('../models/siswaModel');
+const SiswaModel = require("../models/siswaModel");
 
-const addSiswa = async (req, res) => {
-  const { nisn, nama, rfid, jurusan, kelas, kelas_paralel } = req.body;
-  try {
-    const newSiswa = await insertSiswa(nisn, nama, rfid, jurusan, kelas, kelas_paralel);
-    res.status(201).json(newSiswa);
-  } catch (err) {
-    res.status(500).send('Gagal menambahkan siswa');
-  }
-};
-
-const getSiswaList = async (req, res) => {
-  try {
-    const siswa = await getAllSiswa();
-    res.status(200).json(siswa);
-  } catch (err) {
-    res.status(500).send('Gagal mengambil data siswa');
-  }
-};
-
-const getSiswaByIdController = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const siswa = await getSiswaById(id);
-    if (siswa) {
-      res.status(200).json(siswa);
-    } else {
-      res.status(404).send('Siswa tidak ditemukan');
+const getAllSiswa = async (req, res) => {
+    try {
+        const data = await SiswaModel.getAllSiswa();
+        if (data.length === 0) {
+            return res.status(404).json({ status: 404, message: "Data siswa kosong" });
+        }
+        res.status(200).json({ status: 200, message: "Data siswa ditemukan", data });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
-  } catch (err) {
-    res.status(500).send('Gagal mengambil data siswa');
-  }
 };
 
-// Update siswa berdasarkan ID
-const updateSiswaByID = async (req, res) => {
-  const { id } = req.params;
-  const { nisn, nama, rfid, jurusan, kelas, kelas_paralel } = req.body;
-
-  try {
-    const updated = await updateSiswa(id, nisn, nama, rfid, jurusan, kelas, kelas_paralel);
-    if (updated) {
-      res.json(updated);
-    } else {
-      res.status(404).send('❌ Siswa tidak ditemukan.');
+const getSiswaById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const data = await SiswaModel.getSiswaById(id);
+        if (!data) {
+            return res.status(404).json({ status: 404, message: "Data siswa tidak ditemukan" });
+        }
+        res.status(200).json({ status: 200, message: "Data siswa ditemukan", data });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
-  } catch (err) {
-    res.status(500).send('❌ Gagal mengupdate siswa.');
-  }
 };
 
-// Hapus siswa berdasarkan ID
-const deleteSiswaByID = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const deleted = await deleteSiswa(id);
-    if (deleted) {
-      res.json({ message: '✅ Siswa berhasil dihapus.', deleted });
-    } else {
-      res.status(404).send('❌ Siswa tidak ditemukan.');
+const createSiswa = async (req, res) => {
+    try {
+        const { nisn, nama, rfid, jurusan, kelas, kelas_paralel } = req.body;
+        const data = await SiswaModel.createSiswa({ nisn, nama, rfid, jurusan, kelas, kelas_paralel });
+        res.status(201).json({ status: 201, message: "Siswa berhasil ditambahkan", data });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
-  } catch (err) {
-    res.status(500).send('❌ Gagal menghapus siswa.');
-  }
 };
 
+const updateSiswa = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nisn, nama, rfid, jurusan, kelas, kelas_paralel } = req.body;
+        const data = await SiswaModel.updateSiswa(id, { nisn, nama, rfid, jurusan, kelas, kelas_paralel });
+        if (!data) {
+            return res.status(404).json({ status: 404, message: "Data siswa tidak ditemukan" });
+        }
+        res.status(200).json({ status: 200, message: "Siswa berhasil diubah", data });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
-module.exports = { addSiswa, getSiswaList, getSiswaByIdController, updateSiswaByID,deleteSiswaByID };
+const deleteSiswa = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const check = await SiswaModel.getSiswaById(id);
+        if (!check) {
+            return res.status(404).json({ status: 404, message: "Data siswa tidak ditemukan" });
+        }
+        await SiswaModel.deleteSiswa(id);
+        res.status(200).json({ status: 200, message: "Siswa berhasil dihapus" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+module.exports = {
+    getAllSiswa,
+    getSiswaById,
+    createSiswa,
+    updateSiswa,
+    deleteSiswa
+};
