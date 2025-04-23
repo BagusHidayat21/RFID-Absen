@@ -14,11 +14,18 @@ export default function Home() {
   const [status, setStatus] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
+  // Fetch UID terbaru
   useEffect(() => {
     const fetchLatestUID = async () => {
-      const response = await fetch('http://192.168.67.217:5000/api/latest-uid');
-      const data = await response.json();
-      setLatestUID(data.uid);
+      try {
+        const response = await fetch('http://192.168.105.41:5000/api/latest-uid');
+        const data = await response.json();
+        console.log('UID terbaru:', data);
+        setLatestUID(data.uid);
+      } catch (error) {
+        console.error('Gagal fetch UID:', error);
+        setStatus('Gagal mengambil UID');
+      }
     };
 
     if (!latestUID) {
@@ -26,37 +33,48 @@ export default function Home() {
     }
   }, [latestUID]);
 
+  // Cek apakah UID cocok dengan siswa dan lakukan absen
   useEffect(() => {
     if (latestUID) {
       const checkStudent = async () => {
-        // Ambil semua siswa dari API
-        const response = await fetch('http://192.168.67.217:5000/api/siswa');
-        const data: Siswa[] = await response.json();
+        setLoading(true);
+        try {
+          const response = await fetch('http://192.168.105.41:5000/api/siswa');
+          const json = await response.json();
 
-        // Cari siswa berdasarkan RFID
-        const siswa = data.find(student => student.rfid === latestUID);
+          console.log('Response API siswa:', json);
+          
+          // Jika json.data adalah array siswa
+          const siswaList: Siswa[] = Array.isArray(json) ? json : json.data;
 
-        if (siswa) {
-          setSiswaData(siswa);
+          const siswa = siswaList.find(student => student.rfid === latestUID);
 
-          // Kirim data absensi ke API
-          const absenResponse = await fetch('http://192.168.67.217:5000/api/absen', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              idsiswa: siswa.siswa_id,
-              waktu: new Date().toISOString(),
-              status: 'hadir',
-            }),
-          });
+          if (siswa) {
+            setSiswaData(siswa);
 
-          if (absenResponse.ok) {
-            setStatus('Absen berhasil!');
+            const absenResponse = await fetch('http://192.168.105.41:5000/api/absen', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                siswa_id: siswa.id,
+                waktu: new Date().toISOString(),
+                status: 'hadir',
+              }),
+            });
+
+            if (absenResponse.ok) {
+              setStatus('Absen berhasil!');
+            } else {
+              setStatus('Absen gagal!');
+            }
           } else {
-            setStatus('Absen gagal!');
+            setStatus('Siswa tidak ditemukan!');
           }
-        } else {
-          setStatus('Siswa tidak ditemukan!');
+        } catch (error) {
+          console.error('Gagal memproses absen:', error);
+          setStatus('Terjadi kesalahan!');
+        } finally {
+          setLoading(false);
         }
       };
 

@@ -9,7 +9,7 @@ Sistem Absensi Berbasis RFID ini merupakan proyek kolaborasi antara **Mahasiswa 
 
 ## 🧠 Fitur Utama
 
-- 🚀 Deteksi kehadiran siswa melalui kartu RFID
+- 🚀 Deteksi kehadiran siswa melalui kartu RFID                 
 - 💾 Penyimpanan otomatis data absensi ke database
 - 📊 Dashboard rekapitulasi kehadiran siswa
 - 📅 Riwayat absensi berdasarkan tanggal
