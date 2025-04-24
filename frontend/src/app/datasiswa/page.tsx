@@ -41,7 +41,7 @@ export default function StudentForm() {
   
     if (isEditing && formData.id) {
       // UPDATE
-      axios.put(`http://192.168.105.41:5000/api/siswa/${formData.id}`, formData)
+      axios.put(`https://rfid-absen.vercel.app/api/siswa/${formData.id}`, formData)
         .then(response => {
           const updatedStudents = [...students];
           if (editIndex !== null) {
@@ -62,7 +62,7 @@ export default function StudentForm() {
         .catch(error => console.error('Gagal update:', error));
     } else {
       // CREATE
-      axios.post('http://192.168.105.41:5000/api/siswa', formData)
+      axios.post('https://rfid-absen.vercel.app/api/siswa', formData)
         .then(response => {
           setStudents(prev => [...prev, response.data]);
           setFormData({
@@ -78,7 +78,6 @@ export default function StudentForm() {
     }
   };
   
-
   const handleEdit = (index: number) => {
     setFormData(students[index]);
     setIsEditing(true);
@@ -87,7 +86,7 @@ export default function StudentForm() {
 
   const handleDelete = (index: number) => {
     const studentId = students[index].id;
-    axios.delete(`http://192.168.105.41:5000/api/siswa/${studentId}`)
+    axios.delete(`https://rfid-absen.vercel.app/api/siswa/${studentId}`)
       .then(() => {
         const filtered = students.filter((_, i) => i !== index);
         setStudents(filtered);
@@ -99,7 +98,7 @@ export default function StudentForm() {
   useEffect(() => {
     const fetchUID = async () => {
       try {
-        const response = await axios.get('http://192.168.105.41:5000/api/latest-uid');
+        const response = await axios.get('https://rfid-absen.vercel.app/api/latest-uid');
         const latestUID = response?.data?.uid;
 
         if (!isEditing && latestUID && typeof latestUID === 'string') {
@@ -115,13 +114,13 @@ export default function StudentForm() {
 
     const interval = setInterval(() => {
       fetchUID();
-    }, 2000);
+    }, ); // scan tiap 2000 
 
     return () => clearInterval(interval);
   }, [isEditing]);
 
   useEffect(() => {
-    axios.get('http://192.168.105.41:5000/api/siswa')
+    axios.get('https://rfid-absen.vercel.app/api/siswa')
       .then(response => {
         setStudents(response.data);
       })
