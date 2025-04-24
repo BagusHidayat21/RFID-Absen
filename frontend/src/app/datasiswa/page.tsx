@@ -2,21 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Siswa } from '../interface/index'; // Pastikan path ini sesuai dengan struktur folder Anda
 
-interface Student {
-  id?: number;
-  nisn: string;
-  nama: string;
-  rfid: string;
-  jurusan: string;
-  kelas: string;
-  kelas_paralel: string;
-}
-
-type FormData = Student;
+type FormData = Siswa;
 
 export default function StudentForm() {
-  const [students, setStudents] = useState<Student[]>([]);
+  const [students, setStudents] = useState<Siswa[]>([]);
   const [formData, setFormData] = useState<FormData>({
     nisn: '',
     nama: '',
@@ -114,7 +105,7 @@ export default function StudentForm() {
 
     const interval = setInterval(() => {
       fetchUID();
-    }, ); // scan tiap 2000 
+    }, 2000); // scan tiap 2000 
 
     return () => clearInterval(interval);
   }, [isEditing]);
@@ -176,7 +167,6 @@ export default function StudentForm() {
                   className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                   readOnly
-                  
                 />
               </div>
 

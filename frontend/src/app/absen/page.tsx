@@ -1,13 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-
-interface Siswa {
-  id: number;
-  siswa_id: number;
-  nama: string;
-  rfid: string;
-}
+import { Siswa, Absen } from '../interface/index'; // pastikan path sesuai struktur folder kamu
 
 export default function Home() {
   const [latestUID, setLatestUID] = useState<string | null>(null);
@@ -28,7 +22,7 @@ export default function Home() {
       } catch (error) {
         console.error('Gagal mengambil UID terbaru:', error);
       }
-    },); // 2 detik
+    }, 2000); // ← ini tadi kamu kosongin, jadi aku fix ke 2000ms (2 detik)
 
     return () => clearInterval(interval); // bersihin interval
   }, [latestUID]);
@@ -51,11 +45,11 @@ export default function Home() {
 
             // Cek apakah sudah absen hari ini
             const absenHistoryResponse = await axios.get(`https://rfid-absen.vercel.app/api/absen?siswa_id=${siswa.id}`);
-            const absenList = absenHistoryResponse.data.data || [];
+            const absenList: Absen[] = absenHistoryResponse.data.data || [];
 
             const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
-            const sudahAbsen = absenList.some((absen: any) => {
+            const sudahAbsen = absenList.some((absen) => {
               const absenDate = new Date(absen.waktu).toISOString().split('T')[0];
               return absenDate === today;
             });
@@ -89,7 +83,6 @@ export default function Home() {
       checkStudent();
     }
   }, [latestUID]);
-  
 
   // return (
   //   <div style={{ textAlign: 'center', marginTop: '50px' }}>
