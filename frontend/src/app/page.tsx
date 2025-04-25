@@ -2,6 +2,7 @@
 import React, { ReactNode } from 'react';
 import AttendanceCard from '../component/card';
 
+
 // Define an interface for attendance data
 interface AttendanceItem {
   id: number;
@@ -54,7 +55,7 @@ export default function AttendancePage() {
     { id: 7, type: 'sick', title: 'Musfiq', count: 'Musafiq', icon: Icons.sick },
     { id: 8, type: 'absent', title: 'Siswa', count: '10', icon: Icons.absent }
   ];
-
+  
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6">
       <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
