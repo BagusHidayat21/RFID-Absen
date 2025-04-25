@@ -29,6 +29,8 @@ export default function StudentForm() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    console.log(formData); // Log data yang akan dikirim
   
     if (isEditing && formData.id) {
       // UPDATE
@@ -113,6 +115,7 @@ export default function StudentForm() {
   useEffect(() => {
     axios.get('https://rfid-absen.vercel.app/api/siswa')
       .then(response => {
+        console.log(response.data);
         setStudents(response.data);
       })
       .catch(error => console.error('Gagal mengambil data siswa:', error));

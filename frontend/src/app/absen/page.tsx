@@ -1,103 +1,132 @@
 'use client';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Siswa, Absen } from '../interface/index'; // pastikan path sesuai struktur folder kamu
+import { Siswa, Absen } from '../interface/index';
 
 export default function Home() {
   const [latestUID, setLatestUID] = useState<string | null>(null);
+  const [prevUID, setPrevUID] = useState<string | null>(null);
   const [siswaData, setSiswaData] = useState<Siswa | null>(null);
   const [status, setStatus] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
 
-  // Fetch UID terbaru
+  // Polling UID tiap 1 detik
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
         const res = await axios.get('https://rfid-absen.vercel.app/api/latest-uid');
-        const newUID = res.data.uid;
+        const uid = res.data.uid;
 
-        if (newUID && newUID !== latestUID) {
-          setLatestUID(newUID); // update UID, trigger useEffect bawah
+        if (uid && uid !== prevUID) {
+          setLatestUID(uid);
+          setPrevUID(uid);
+          setSiswaData(null);
+          setStatus('');
         }
       } catch (error) {
-        console.error('Gagal mengambil UID terbaru:', error);
+        console.error('Gagal ambil UID:', error);
       }
-    }, 2000); // ← ini tadi kamu kosongin, jadi aku fix ke 2000ms (2 detik)
+    }, 1000); // tiap 1 detik
 
-    return () => clearInterval(interval); // bersihin interval
-  }, [latestUID]);
+    return () => clearInterval(interval);
+  }, [prevUID]);
 
-  // Cek apakah UID cocok dengan siswa dan lakukan absen
+  // Cari siswa berdasarkan UID
   useEffect(() => {
-    if (latestUID) {
-      const checkStudent = async () => {
-        setLoading(true);
-        try {
-          const response = await axios.get('https://rfid-absen.vercel.app/api/siswa');
-          const siswaList: Siswa[] = Array.isArray(response.data)
-            ? response.data
-            : response.data.data;
+    const fetchSiswa = async () => {
+      if (!latestUID) return;
 
-          const siswa = siswaList.find(student => student.rfid === latestUID);
+      try {
+        const response = await axios.get('https://rfid-absen.vercel.app/api/siswa');
+        const siswaList: Siswa[] = Array.isArray(response.data)
+          ? response.data
+          : response.data.data;
 
-          if (siswa) {
-            setSiswaData(siswa);
+        const siswa = siswaList.find((student) => student.rfid === latestUID);
 
-            // Cek apakah sudah absen hari ini
-            const absenHistoryResponse = await axios.get(`https://rfid-absen.vercel.app/api/absen?siswa_id=${siswa.id}`);
-            const absenList: Absen[] = absenHistoryResponse.data.data || [];
-
-            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-
-            const sudahAbsen = absenList.some((absen) => {
-              const absenDate = new Date(absen.waktu).toISOString().split('T')[0];
-              return absenDate === today;
-            });
-
-            if (sudahAbsen) {
-              setStatus('Siswa sudah absen hari ini!');
-            } else {
-              const absenResponse = await axios.post('https://rfid-absen.vercel.app/api/absen', {
-                siswa_id: siswa.id,
-                waktu: new Date().toISOString(),
-                status: 'hadir',
-              });
-
-              if (absenResponse.status === 200) {
-                setStatus('Absen berhasil!');
-              } else {
-                setStatus('Absen gagal');
-              }
-            }
-          } else {
-            setStatus('Siswa tidak ditemukan!');
-          }
-        } catch (error) {
-          console.error('Gagal memproses absen:', error);
-          setStatus('Terjadi kesalahan!');
-        } finally {
-          setLoading(false);
+        if (siswa) {
+          setSiswaData(siswa);
+        } else {
+          setSiswaData(null);
+          setStatus('Siswa tidak ditemukan!');
         }
-      };
+      } catch (error) {
+        console.error('Gagal mencari siswa:', error);
+        setStatus('Terjadi kesalahan!');
+      }
+    };
 
-      checkStudent();
-    }
+    fetchSiswa();
   }, [latestUID]);
 
-  // return (
-  //   <div style={{ textAlign: 'center', marginTop: '50px' }}>
-  //     <h1>Deteksi RFID dan Absen</h1>
-  //     <p>{status}</p>
-  //     {loading && <p>Loading...</p>}
-  //     <div>
-  //       <p>UID terakhir: {latestUID}</p>
-  //       {siswaData && (
-  //         <div>
-  //           <p>Nama Siswa: {siswaData.nama}</p>
-  //           <p>ID Siswa: {siswaData.id}</p>
-  //         </div>
-  //       )}
-  //     </div>
-  //   </div>
-  // );
+  // Proses absen otomatis saat siswaData ditemukan
+  useEffect(() => {
+    const handleAbsen = async () => {
+      if (!siswaData) return;
+
+      const today = new Date().toISOString().split('T')[0];
+      const storageKey = `sudahAbsen-${siswaData.id}-${today}`;
+
+      try {
+        const absenHistoryResponse = await axios.get(
+          `https://rfid-absen.vercel.app/api/absen?siswa_id=${siswaData.id}`
+        );
+
+        const absenList: Absen[] = absenHistoryResponse.data.data || [];
+
+        const sudahAbsen = absenList.some((absen) => {
+          const absenDate = new Date(absen.waktu).toISOString().split('T')[0];
+          return absenDate === today;
+        });
+
+        if (sudahAbsen) {
+          setStatus('Siswa sudah absen hari ini!');
+        } else {
+          const absenResponse = await axios.post(
+            'https://rfid-absen.vercel.app/api/absen',
+            {
+              siswa_id: siswaData.id,
+              waktu: new Date().toISOString(),
+              status: 'hadir',
+            }
+          );
+
+          if (absenResponse.status === 201) {
+            setStatus('Absen berhasil!');
+            localStorage.setItem(storageKey, 'true');
+          } else {
+            setStatus('Absen gagal.');
+          }
+        }
+      } catch (error) {
+        console.error('Gagal proses absen:', error);
+        setStatus('Terjadi kesalahan!');
+      }
+    };
+
+    if (siswaData) handleAbsen();
+  }, [siswaData]);
+
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      textAlign: 'center',
+    }}>
+      <h1>Absen RFID</h1>
+
+      <p><strong>UID:</strong> {latestUID || 'Menunggu scan...'}</p>
+
+      {status && <p>{status}</p>}
+
+      {siswaData && (
+        <div>
+          <p><strong>Nama:</strong> {siswaData.nama}</p>
+          <p><strong>ID:</strong> {siswaData.id}</p>
+        </div>
+      )}
+    </div>
+  );
 }
