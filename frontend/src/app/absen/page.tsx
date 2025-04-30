@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Siswa, Absen } from '../interface/index';
+import Topbar from '@/components/Header'; // Assume Topbar component is in components folder
+import Sidebar from '@/components/Sidebar';
 
 export default function Home() {
   const [latestUID, setLatestUID] = useState<string | null>(null);
@@ -9,7 +11,6 @@ export default function Home() {
   const [siswaData, setSiswaData] = useState<Siswa | null>(null);
   const [status, setStatus] = useState<string>('');
 
-  // Polling UID tiap 1 detik
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
@@ -25,12 +26,11 @@ export default function Home() {
       } catch (error) {
         console.error('Gagal ambil UID:', error);
       }
-    }, 1000); // tiap 1 detik
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [prevUID]);
 
-  // Cari siswa berdasarkan UID
   useEffect(() => {
     const fetchSiswa = async () => {
       if (!latestUID) return;
@@ -58,7 +58,6 @@ export default function Home() {
     fetchSiswa();
   }, [latestUID]);
 
-  // Proses absen otomatis saat siswaData ditemukan
   useEffect(() => {
     const handleAbsen = async () => {
       if (!siswaData) return;
@@ -66,36 +65,26 @@ export default function Home() {
       const today = new Date().toISOString().split('T')[0];
       const storageKey = `sudahAbsen-${siswaData.id}-${today}`;
 
+      if (localStorage.getItem(storageKey) === 'true') {
+        setStatus('Siswa sudah absen hari ini!');
+        return;
+      }
+
       try {
-        const absenHistoryResponse = await axios.get(
-          `https://rfid-absen.vercel.app/api/absen?siswa_id=${siswaData.id}`
+        const absenResponse = await axios.post(
+          'https://rfid-absen.vercel.app/api/absen',
+          {
+            siswa_id: siswaData.id,
+            waktu: new Date().toISOString(),
+            status: 'hadir',
+          }
         );
 
-        const absenList: Absen[] = absenHistoryResponse.data.data || [];
-
-        const sudahAbsen = absenList.some((absen) => {
-          const absenDate = new Date(absen.waktu).toISOString().split('T')[0];
-          return absenDate === today;
-        });
-
-        if (sudahAbsen) {
-          setStatus('Siswa sudah absen hari ini!');
+        if (absenResponse.status === 201) {
+          setStatus('Absen berhasil!');
+          localStorage.setItem(storageKey, 'true');
         } else {
-          const absenResponse = await axios.post(
-            'https://rfid-absen.vercel.app/api/absen',
-            {
-              siswa_id: siswaData.id,
-              waktu: new Date().toISOString(),
-              status: 'hadir',
-            }
-          );
-
-          if (absenResponse.status === 201) {
-            setStatus('Absen berhasil!');
-            localStorage.setItem(storageKey, 'true');
-          } else {
-            setStatus('Absen gagal.');
-          }
+          setStatus('Absen gagal.');
         }
       } catch (error) {
         console.error('Gagal proses absen:', error);
@@ -107,26 +96,30 @@ export default function Home() {
   }, [siswaData]);
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh',
-      textAlign: 'center',
-    }}>
-      <h1>Absen RFID</h1>
-
-      <p><strong>UID:</strong> {latestUID || 'Menunggu scan...'}</p>
-
-      {status && <p>{status}</p>}
-
-      {siswaData && (
-        <div>
-          <p><strong>Nama:</strong> {siswaData.nama}</p>
-          <p><strong>ID:</strong> {siswaData.id}</p>
+    <div style={{ display: 'flex', height: '100vh' }}>
+      <Sidebar />
+      <div style={{ flexGrow: 1 }}>
+        <Topbar user={{ name: "Musfiq", role: "Guru" }} />
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          textAlign: 'center',
+          marginTop: '2rem'
+        }}>
+          <h1>Absen RFID</h1>
+          <p><strong>UID:</strong> {latestUID || 'Menunggu scan...'}</p>
+          {status && <p>{status}</p>}
+          {siswaData && (
+            <div>
+              <p><strong>Nama:</strong> {siswaData.nama}</p>
+              <p><strong>ID:</strong> {siswaData.id}</p>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
+
