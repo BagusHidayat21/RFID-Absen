@@ -1,6 +1,6 @@
 import { JurusanProps } from '@/types';
 
-const Jurusan: React.FC<JurusanProps> = ({ type, title, count, rombel, icon, onClick }) => {
+const Jurusan: React.FC<JurusanProps> = ({ type, title, count, rombel, icon }) => {
   const cardStyles = {
     n1: { card: 'bg-pink-50', icon: 'bg-pink-400 text-white' },
     n2: { card: 'bg-amber-50', icon: 'bg-amber-300 text-white' },
@@ -11,10 +11,7 @@ const Jurusan: React.FC<JurusanProps> = ({ type, title, count, rombel, icon, onC
   const style = cardStyles[type] || cardStyles.n1;
 
   return (
-    <div 
-      className={`p-6 rounded-xl ${style.card} hover:translate-y-[-4px] transition-transform duration-200 cursor-pointer hover:shadow-md`}
-      onClick={onClick} // Tangkap event klik
-    >
+    <div>
       <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-3 ${style.icon}`}>
         {icon}
       </div>

@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 
 import {Faculty } from '@/types/index';
@@ -9,8 +9,6 @@ import { IoCubeOutline } from 'react-icons/io5';
 import Jurusan from '@/components/Jurusan';
 
 export default function Home() {
-  const [selectedFaculty, setSelectedFaculty] = useState<Faculty | null>(null);
-
   const Icons = {
     all: <IoCubeOutline size={24} color="white" />
   };
