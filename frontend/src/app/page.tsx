@@ -1,17 +1,9 @@
 "use client";
 
-import React, { ReactNode } from "react";
 import Sidebar from "@/components/Sidebar";
-import AttendanceCard from "@/components/card";
+import Card from "@/components/Card";
 import Topbar from "@/components/Header";
-
-interface AttendanceItem {
-  id: number;
-  type: "present" | "leave" | "sick" | "absent";
-  title: string;
-  count: string;
-  icon: ReactNode;
-}
+import { AttendanceItem } from "@/types";
 
 // Icons
 const Icons = {
@@ -77,7 +69,7 @@ export default function AttendancePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               {attendanceData.map((item) => (
-                <AttendanceCard
+                <Card
                   key={item.id}
                   type={item.type}
                   title={item.title}

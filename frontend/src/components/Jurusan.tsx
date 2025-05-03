@@ -1,17 +1,6 @@
-import React, { ReactNode } from 'react';
+import { JurusanProps } from '@/types';
 
-type CardType = 'n1' | 'n2' | 'n3' | 'n4';
-
-interface FacultyCardProps {
-  type: CardType;
-  title: string;
-  count: string;
-  rombel: string;
-  icon: ReactNode;
-  onClick: () => void; // Tambahkan prop untuk event klik
-}
-
-const FacultyCard: React.FC<FacultyCardProps> = ({ type, title, count, rombel, icon, onClick }) => {
+const Jurusan: React.FC<JurusanProps> = ({ type, title, count, rombel, icon, onClick }) => {
   const cardStyles = {
     n1: { card: 'bg-pink-50', icon: 'bg-pink-400 text-white' },
     n2: { card: 'bg-amber-50', icon: 'bg-amber-300 text-white' },
@@ -36,4 +25,4 @@ const FacultyCard: React.FC<FacultyCardProps> = ({ type, title, count, rombel, i
   );
 };
 
-export default FacultyCard;
+export default Jurusan;

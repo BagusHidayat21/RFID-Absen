@@ -1,18 +1,7 @@
-// AttendanceCard.tsx
-import React, { ReactNode } from 'react';
+// Card.tsx
+import { CardProps } from "@/types";
 
-// Define types for props
-type CardType = 'present' | 'leave' | 'sick' | 'absent';
-
-interface AttendanceCardProps {
-  type: CardType;
-  title: string;
-  count: string;
-  icon: ReactNode;
-}
-
-const AttendanceCard: React.FC<AttendanceCardProps> = ({ type, title, count, icon }) => {
-  // Card style variants based on type
+const Card: React.FC<CardProps> = ({ type, title, count, icon }) => {
   const cardStyles = {
     present: {
       card: 'bg-pink-50',
@@ -46,4 +35,4 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({ type, title, count, ico
   );
 };
 
-export default AttendanceCard;
+export default Card;

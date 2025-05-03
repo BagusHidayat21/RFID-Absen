@@ -1,26 +1,29 @@
 'use client';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Siswa, Absen } from '../interface/index';
+import { Students } from '@/types';
 import Topbar from '@/components/Header'; // Assume Topbar component is in components folder
 import Sidebar from '@/components/Sidebar';
+
+
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export default function Home() {
   const [latestUID, setLatestUID] = useState<string | null>(null);
   const [prevUID, setPrevUID] = useState<string | null>(null);
-  const [siswaData, setSiswaData] = useState<Siswa | null>(null);
+  const [StudentsData, setStudentsData] = useState<Students | null>(null);
   const [status, setStatus] = useState<string>('');
 
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const res = await axios.get('https://rfid-absen.vercel.app/api/latest-uid');
+        const res = await axios.get(`${baseURL}latest-uid`);
         const uid = res.data.uid;
 
         if (uid && uid !== prevUID) {
           setLatestUID(uid);
           setPrevUID(uid);
-          setSiswaData(null);
+          setStudentsData(null);
           setStatus('');
         }
       } catch (error) {
@@ -32,41 +35,41 @@ export default function Home() {
   }, [prevUID]);
 
   useEffect(() => {
-    const fetchSiswa = async () => {
+    const fetchStudents = async () => {
       if (!latestUID) return;
 
       try {
-        const response = await axios.get('https://rfid-absen.vercel.app/api/siswa');
-        const siswaList: Siswa[] = Array.isArray(response.data)
+        const response = await axios.get('https://rfid-absen.vercel.app/api/Students');
+        const StudentsList: Students[] = Array.isArray(response.data)
           ? response.data
           : response.data.data;
 
-        const siswa = siswaList.find((student) => student.rfid === latestUID);
+        const Students = StudentsList.find((student) => student.rfid === latestUID);
 
-        if (siswa) {
-          setSiswaData(siswa);
+        if (Students) {
+          setStudentsData(Students);
         } else {
-          setSiswaData(null);
-          setStatus('Siswa tidak ditemukan!');
+          setStudentsData(null);
+          setStatus('Students tidak ditemukan!');
         }
       } catch (error) {
-        console.error('Gagal mencari siswa:', error);
+        console.error('Gagal mencari Students:', error);
         setStatus('Terjadi kesalahan!');
       }
     };
 
-    fetchSiswa();
+    fetchStudents();
   }, [latestUID]);
 
   useEffect(() => {
     const handleAbsen = async () => {
-      if (!siswaData) return;
+      if (!StudentsData) return;
 
       const today = new Date().toISOString().split('T')[0];
-      const storageKey = `sudahAbsen-${siswaData.id}-${today}`;
+      const storageKey = `sudahAbsen-${StudentsData.id}-${today}`;
 
       if (localStorage.getItem(storageKey) === 'true') {
-        setStatus('Siswa sudah absen hari ini!');
+        setStatus('Students sudah absen hari ini!');
         return;
       }
 
@@ -74,7 +77,7 @@ export default function Home() {
         const absenResponse = await axios.post(
           'https://rfid-absen.vercel.app/api/absen',
           {
-            siswa_id: siswaData.id,
+            Students_id: StudentsData.id,
             waktu: new Date().toISOString(),
             status: 'hadir',
           }
@@ -92,8 +95,8 @@ export default function Home() {
       }
     };
 
-    if (siswaData) handleAbsen();
-  }, [siswaData]);
+    if (StudentsData) handleAbsen();
+  }, [StudentsData]);
 
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
@@ -111,10 +114,10 @@ export default function Home() {
           <h1>Absen RFID</h1>
           <p><strong>UID:</strong> {latestUID || 'Menunggu scan...'}</p>
           {status && <p>{status}</p>}
-          {siswaData && (
+          {StudentsData && (
             <div>
-              <p><strong>Nama:</strong> {siswaData.nama}</p>
-              <p><strong>ID:</strong> {siswaData.id}</p>
+              <p><strong>Nama:</strong> {StudentsData.nama}</p>
+              <p><strong>ID:</strong> {StudentsData.id}</p>
             </div>
           )}
         </div>
