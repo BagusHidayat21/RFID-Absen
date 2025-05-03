@@ -44,7 +44,7 @@ export interface JurusanProps {
 }
 export type Faculty = {
   id: number;
-  type: 'n1' | 'n2' | 'n3' | 'n4';
+  type: CardType
   title: string;
   count: string;
   rombel: string;

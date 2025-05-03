@@ -49,18 +49,19 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            {facultyData.map((item) => (
-              <Link key={item.id} href={`/datasiswa/${item.slug}`}>
-              <Jurusan 
-                key={item.id} 
-                type={item.type} 
-                title={item.title} 
-                count={item.count} 
-                rombel={item.rombel} 
-                icon={item.icon}
-              />
-              </Link>
-            ))}
+              {facultyData.map((item) => (
+                <Link key={item.id} href={`/datasiswa/${item.slug}`} className="block">
+                  <div className={`p-4 rounded-lg shadow-md ${item.type === 'n1' ? 'bg-pink-50' : item.type === 'n2' ? 'bg-amber-50' : item.type === 'n3' ? 'bg-green-50' : 'bg-purple-50'}`}>
+                    <Jurusan 
+                      type={item.type} 
+                      title={item.title} 
+                      count={item.count} 
+                      rombel={item.rombel} 
+                      icon={item.icon}
+                    />
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
         </main>
