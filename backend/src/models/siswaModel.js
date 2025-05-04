@@ -2,38 +2,58 @@ const { pool } = require("../config/db");
 
 const SiswaModel = {
   getAllSiswa: async () => {
-    const result = await pool.query("SELECT * FROM data_siswa ORDER BY id");
-    return result.rows;
+    try {
+      const result = await pool.query("SELECT * FROM siswa ORDER BY id");
+      return result.rows;
+    } catch (error) {
+      throw error;
+    }
   },
 
   getSiswaById: async (id) => {
-    const result = await pool.query("SELECT * FROM data_siswa WHERE id = $1", [id]);
-    return result.rows[0];
+    try {
+      const result = await pool.query("SELECT * FROM siswa WHERE id = $1", [id]);
+      return result.rows[0];
+    } catch (error) {
+      throw error;
+    }
   },
 
-  createSiswa: async ({ nisn, nama, rfid, jurusan, kelas, kelas_paralel }) => {
-    const result = await pool.query(
-      `INSERT INTO data_siswa (nisn, nama, rfid, jurusan, kelas, kelas_paralel)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING *`,
-      [nisn, nama, rfid, jurusan, kelas, kelas_paralel]
-    );
-    return result.rows[0];
+  createSiswa: async ({ nama, nis, rfid_uid, kelas_id, jurusan_id, pararel_id }) => {
+    try {
+      const result = await pool.query(
+        `INSERT INTO siswa (nama, nis, rfid_uid, kelas_id, jurusan_id, pararel_id)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         RETURNING *`,
+        [nama, nis, rfid_uid, kelas_id, jurusan_id, pararel_id]
+      );
+      return result.rows[0];
+    } catch (error) {
+      throw error;
+    }
   },
 
-  updateSiswa: async (id, { nisn, nama, rfid, jurusan, kelas, kelas_paralel }) => {
-    const result = await pool.query(
-      `UPDATE data_siswa
-       SET nisn = $1, nama = $2, rfid = $3, jurusan = $4, kelas = $5, kelas_paralel = $6
-       WHERE id = $7
-       RETURNING *`,
-      [nisn, nama, rfid, jurusan, kelas, kelas_paralel, id]
-    );
-    return result.rows[0];
+  updateSiswa: async (id, { nama, nis, rfid_uid, kelas_id, jurusan_id, pararel_id }) => {
+    try {
+      const result = await pool.query(
+        `UPDATE siswa
+         SET nama = $1, nis = $2, rfid_uid = $3, kelas_id = $4, jurusan_id = $5, pararel_id = $6
+         WHERE id = $7
+         RETURNING *`,
+        [nama, nis, rfid_uid, kelas_id, jurusan_id, pararel_id, id]
+      );
+      return result.rows[0];
+    } catch (error) {
+      throw error;
+    }
   },
 
   deleteSiswa: async (id) => {
-    await pool.query("DELETE FROM data_siswa WHERE id = $1", [id]);
+    try {
+      await pool.query("DELETE FROM siswa WHERE id = $1", [id]);
+    } catch (error) {
+      throw error;
+    }
   },
 };
 
