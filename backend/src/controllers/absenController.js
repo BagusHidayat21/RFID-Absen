@@ -125,4 +125,3 @@ const AbsenController = {
 };
 
 module.exports = AbsenController;
-

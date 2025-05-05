@@ -1,6 +1,15 @@
 const { pool } = require("../config/db");
 
 const AdminModel = {
+  getAdminByUsername: async (username) => {
+    try {
+      const result = await pool.query("SELECT * FROM admin WHERE username = $1", [username]);
+      return result.rows[0];
+    } catch (err) {
+      throw err;
+    }
+  },
+  
   getAllAdmin: async () => {
     try {
       const result = await pool.query("SELECT * FROM admin");

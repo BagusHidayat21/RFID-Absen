@@ -123,4 +123,3 @@ const KelasController = {
 };
 
 module.exports = KelasController;
-

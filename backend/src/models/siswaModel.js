@@ -3,7 +3,9 @@ const { pool } = require("../config/db");
 const SiswaModel = {
   getAllSiswa: async () => {
     try {
-      const result = await pool.query("SELECT * FROM siswa ORDER BY id");
+      const result = await pool.query(
+        `SELECT * from siswa`
+      );
       return result.rows;
     } catch (error) {
       throw error;
@@ -14,6 +16,24 @@ const SiswaModel = {
     try {
       const result = await pool.query("SELECT * FROM siswa WHERE id = $1", [id]);
       return result.rows[0];
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getAllSiswabyKelas: async (jurusan, kelas) => {
+    try {
+      const result = await pool.query(
+        `SELECT s.id, s.nama, s.nis, s.rfid_uid, j.nama as jurusan, k.nama as kelas, p.nama as pararel
+         FROM siswa s
+         JOIN jurusan j ON s.jurusan_id = j.id
+         JOIN kelas k ON s.kelas_id = k.id
+         JOIN pararel p ON s.pararel_id = p.id
+         WHERE j.nama = $1 AND k.nama = $2
+         ORDER BY s.nama ASC`,
+        [jurusan, kelas]
+      );
+      return result.rows;
     } catch (error) {
       throw error;
     }

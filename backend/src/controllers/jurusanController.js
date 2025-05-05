@@ -123,4 +123,3 @@ const JurusanController = {
 };
 
 module.exports = JurusanController;
-

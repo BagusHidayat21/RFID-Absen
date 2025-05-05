@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Students } from '@/types';
-import Topbar from '@/components/Header'; // Assume Topbar component is in components folder
+import Topbar from '@/components/Header'; 
 import Sidebar from '@/components/Sidebar';
 
 

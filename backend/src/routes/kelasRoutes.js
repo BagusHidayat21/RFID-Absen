@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-
 const KelasController = require('../controllers/kelasController');
 
 router.get('/kelas', KelasController.getAllKelas);

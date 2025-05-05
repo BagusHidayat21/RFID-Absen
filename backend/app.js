@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const authMiddleware = require('./src/middleware/authMiddleware');
 
 const siswaRoutes = require('./src/routes/siswaRoutes');
 const absenRoutes = require('./src/routes/absenRoutes');
@@ -22,6 +23,14 @@ app.get('/', (req, res) => {
 });
 
 // Routing
+app.use((req, res, next) => {
+  const excludedRoutes = ['/api/login', '/api/logout', '/api/absen', '/api/absen/:id'];
+  if (excludedRoutes.includes(req.path)) {
+    return next();
+  }
+  authMiddleware(req, res, next);
+});
+
 app.use('/api', siswaRoutes);
 app.use('/api', absenRoutes);
 app.use('/api', adminRoutes);
@@ -54,3 +63,58 @@ app.listen(port, async () => {
   console.log(`Server berjalan di http://0.0.0.0:${port}`);
   console.log('Database Berhasil Terhubung');
 });
+
+// List of all endpoints
+
+// Default route
+app.get('/', ...);
+
+// Siswa Routes
+app.get('/api/siswa', ...);
+app.get('/api/siswa/:id', ...);
+app.get('/api/siswa/:jurusan/:kelas', ...);
+app.post('/api/siswa', ...);
+app.put('/api/siswa/:id', ...);
+app.delete('/api/siswa/:id', ...);
+
+// Absen Routes
+app.get('/api/absen', ...);
+app.get('/api/absen/:id', ...);
+app.post('/api/absen', ...);
+app.put('/api/absen/:id', ...);
+app.delete('/api/absen/:id', ...);
+
+// Admin Routes
+app.post('/api/login', ...);
+app.post('/api/logout', ...);
+app.get('/api/admin', ...);
+app.get('/api/admin/:id', ...);
+app.post('/api/admin', ...);
+app.put('/api/admin/:id', ...);
+app.delete('/api/admin/:id', ...);
+
+// Kelas Routes
+app.get('/api/kelas', ...);
+app.get('/api/kelas/:id', ...);
+app.post('/api/kelas', ...);
+app.put('/api/kelas/:id', ...);
+app.delete('/api/kelas/:id', ...);
+
+// Pararel Routes
+app.get('/api/pararel', ...);
+app.get('/api/pararel/:id', ...);
+app.post('/api/pararel', ...);
+app.put('/api/pararel/:id', ...);
+app.delete('/api/pararel/:id', ...);
+
+// Jurusan Routes
+app.get('/api/jurusan', ...);
+app.get('/api/jurusan/:id', ...);
+app.post('/api/jurusan', ...);
+app.put('/api/jurusan/:id', ...);
+app.delete('/api/jurusan/:id', ...);
+
+// RFID UID Routes
+app.post('/api/rfid', ...);
+app.get('/api/latest-uid', ...);
+

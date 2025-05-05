@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-
 const JurusanController = require("../controllers/jurusanController");
 
 router.get("/jurusan", JurusanController.getAllJurusan);

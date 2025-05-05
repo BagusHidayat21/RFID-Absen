@@ -1,30 +1,8 @@
-// types.ts
-export interface Student {
-  id?: number;
-  nisn: string;
-  nama: string;
-  rfid: string;
-  jurusan: string;
-  kelas: string;
-  kelas_paralel: string;
-}
-
-export interface StudentTableProps {
-  students: Student[];
-  currentPage: number;
-  totalPages: number;
-  totalItems: number;
-  itemsPerPage: number;
-  onPageChange: (page: number) => void;
-  onItemsPerPageChange: (itemsPerPage: number) => void;
-  onSearch: (query: string) => void;
-  onAddStudent: () => void;
-}
-
 // StudentTable.tsx
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Filter, ChevronDown, Search } from 'lucide-react';
 import Button from './Button';
+import { StudentTableProps } from '@/types/index';
 
 const StudentTable: React.FC<StudentTableProps> = ({
   students,

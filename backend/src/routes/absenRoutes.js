@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-
 const AbsenController = require("../controllers/absenController");
 
 router.get("/absen", AbsenController.getAllAbsen);

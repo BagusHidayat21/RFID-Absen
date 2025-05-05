@@ -108,4 +108,3 @@ const PararelController = {
 };
 
 module.exports = PararelController;
-

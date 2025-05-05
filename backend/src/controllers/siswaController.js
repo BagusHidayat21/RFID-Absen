@@ -46,6 +46,29 @@ const SiswaController = {
     }
   },
 
+  getAllSiswabyKelas: async (req, res) => {
+    try {
+      const { jurusan, kelas } = req.params;
+      const result = await SiswaModel.getAllSiswabyKelas(jurusan, kelas);
+      if (!result || result.length === 0) {
+        return res.status(404).json({
+          "status": 404,
+          "message": "Data siswa tidak ditemukan",
+        });
+      }
+      res.status(200).json({
+        "status": 200,
+        "message": "Berhasil menampilkan semua data siswa",
+        "data": result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        "status": 500,
+        "error": error.message,
+      });
+    }
+  },
+
   createSiswa: async (req, res) => {
     try {
       const { nama, nis, rfid_uid, kelas_id, jurusan_id, pararel_id } = req.body;
@@ -138,4 +161,3 @@ const SiswaController = {
 };
 
 module.exports = SiswaController;
-
