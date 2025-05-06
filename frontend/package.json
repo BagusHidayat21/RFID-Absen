@@ -12,6 +12,8 @@
     "@mantine/charts": "^7.17.7",
     "@mantine/core": "^7.17.7",
     "@mantine/hooks": "^7.17.7",
+    "@nivo/bar": "^0.93.0",
+    "@nivo/pie": "^0.93.0",
     "axios": "^1.8.4",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
