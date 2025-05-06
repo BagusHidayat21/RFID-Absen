@@ -20,7 +20,7 @@ export default function Sidebar() {
     <aside className="h-screen w-64 bg-white p-4 flex flex-col">
       <div className="text-2xl font-semibold mb-6 flex items-center gap-2">
         <img className="bg-[#6F4EF2] p-2 rounded-lg text-white" src="/Sidebar.svg" alt="" />
-        <div className="font-semibold">RFID</div>
+        <div className="font-semibold text-black">RFID</div>
       </div>
       
 

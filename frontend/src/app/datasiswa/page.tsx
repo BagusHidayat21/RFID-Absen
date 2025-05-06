@@ -41,9 +41,6 @@ export default function Home() {
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
               <h1 className="text-xl font-semibold text-gray-900">Jurusan</h1>
               <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-                </svg>
                 Bulan & Tahun
               </button>
             </div>

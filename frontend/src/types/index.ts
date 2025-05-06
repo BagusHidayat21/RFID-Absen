@@ -83,3 +83,24 @@ export interface StudentTableProps {
   onAddStudent: () => void;
 }
 
+// Pie Chart
+export type PieChartDatum = {
+  id: string;
+  label: string;
+  value: number;
+  color: string;
+};
+
+// DataType
+export type DataType = {
+  month: string;
+  "Siswa Hadir": number;
+  "Siswa Absen": number;
+};
+
+
+// Custom layer component for center text
+export interface CenterTextProps {
+  centerX: number;
+  centerY: number;
+}

@@ -3,12 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@mantine/charts": "^7.17.7",
+    "@mantine/core": "^7.17.7",
+    "@mantine/hooks": "^7.17.7",
     "axios": "^1.8.4",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -17,6 +20,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
+    "recharts": "^2.15.3",
     "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
