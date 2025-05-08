@@ -1,8 +1,12 @@
 // StudentTable.tsx
+import Link from 'next/link';
+import { useParams } from 'next/navigation'; 
+import axios from 'axios';
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Filter, ChevronDown, Search } from 'lucide-react';
 import Button from './Button';
 import { StudentTableProps } from '@/types/index';
+
 
 const StudentTable: React.FC<StudentTableProps> = ({
   students,
@@ -22,7 +26,10 @@ const StudentTable: React.FC<StudentTableProps> = ({
     setSelectedClass(event.target.value);
   };
 
-  const filteredStudents = students.filter(student => !selectedClass || student.kelas_paralel === selectedClass);
+  const filteredStudents = students.filter(student => !selectedClass);
+  const params = useParams();
+  const jurusan = params?.jurusan as string;
+  const kelas = params?.kelas as string;
 
   return (
     <div className="w-full bg-white rounded-lg shadow-sm overflow-hidden">
@@ -59,12 +66,11 @@ const StudentTable: React.FC<StudentTableProps> = ({
           </select>
         </div>
 
-        <button
-          onClick={onAddStudent}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center transition-colors"
-        >
+        <Link href={`/datasiswa/${jurusan}/${kelas}/tambahsiswa`}>
+        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center transition-colors">
           <span className="mr-1">+</span> Tambahkan Siswa
         </button>
+        </Link>
       </div>
 
       {/* Table section */}
@@ -102,11 +108,11 @@ const StudentTable: React.FC<StudentTableProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.nisn}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.nis}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.nama}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">{student.kelas}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">{student.kelas_paralel || '-'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">{student.jurusan}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">{student.kelas_id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">{student.pararel_id || '-'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">{student.jurusan_id}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">
                     <Button variant='edit' className="mr-2">Edit</Button>
                     <Button variant='hapus'>Hapus</Button>

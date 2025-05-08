@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const AdminModel = require("../models/adminModel");
-const { generateAccessToken, generateRefreshToken } = require("../utils/jwt");
+const { generateAccessToken, generateRefreshToken,verifyRefreshToken } = require("../utils/jwt");
 const AdminTokenModel = require("../models/adminTokenModel");
 
 const AdminController = {
@@ -192,6 +192,44 @@ const AdminController = {
       });
     }
   },
+
+refreshAccessToken: async (req,res) => {
+  try {
+    const { admin_id } = req.body;
+
+    
+    const result = await AdminTokenModel.get(admin_id);
+    if (!result || !result.refresh_token) {
+      return res.status(404).json({
+        status: 404,  
+        message: 'Refresh token tidak ditemukan'
+         });
+    }
+
+    const decoded = await verifyRefreshToken(result.refresh_token);
+    if (!decoded || !decoded.id) {
+      return res.status(403).json({
+        status: 403,
+        message: 'Refresh token tidak valid'
+         });
+    }
+
+    const newAccessToken = await generateAccessToken(decoded.id);
+
+    return res.status(200).json({
+      status: 200,
+      message: 'Berhasil memperbarui access token',
+      access_token: newAccessToken
+      
+    });
+  } catch (error) {
+    console.error('Refresh token error:', error);
+    return res.status(500).json({
+      status: 500,
+       message: 'Gagal me-refresh access token'
+       });
+  }
+  }
 };
 
 module.exports = AdminController;

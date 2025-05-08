@@ -64,12 +64,12 @@ export type Class = {
 //Absen
 export type Students = {
   id?: number;
-  nisn: string;
+  nis: string;
   nama: string;
   rfid: string;
-  jurusan: string;
-  kelas: string;
-  kelas_paralel: string;
+  jurusan_id: string;
+  kelas_id: string;
+  pararel_id: string;
 };
 export interface StudentTableProps {
   students: Students[];
@@ -103,4 +103,19 @@ export type DataType = {
 export interface CenterTextProps {
   centerX: number;
   centerY: number;
+}
+
+
+export interface StudentDataFormProps {
+  onSubmit?: (data: StudentFormData) => void;
+  onCancel?: () => void;
+}
+
+export interface StudentFormData {
+  nis: string;
+  rfid_uid: number;
+  nama: string;
+  kelas_id: number;
+  jurusan_id: number;
+  pararel_id: number;
 }

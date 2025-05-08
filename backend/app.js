@@ -23,13 +23,13 @@ app.get('/', (req, res) => {
 });
 
 // Routing
-app.use((req, res, next) => {
-  const excludedRoutes = ['/api/login', '/api/logout', '/api/absen', '/api/absen/:id'];
-  if (excludedRoutes.includes(req.path)) {
-    return next();
-  }
-  authMiddleware(req, res, next);
-});
+// app.use((req, res, next) => {
+//   const excludedRoutes = ['/api/login', '/api/logout', '/api/absen', '/api/absen/:id'];
+//   if (excludedRoutes.includes(req.path)) {
+//     return next();
+//   }
+//   authMiddleware(req, res, next);
+// });
 
 app.use('/api', siswaRoutes);
 app.use('/api', absenRoutes);

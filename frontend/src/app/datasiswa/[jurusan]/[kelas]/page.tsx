@@ -5,6 +5,7 @@ import Sidebar from '@/components/Sidebar';
 import Topbar from '@/components/Header';
 import StudentTable from '@/components/StudentTable';
 import { Students } from '@/types/index';
+import { useParams } from 'next/navigation'; 
 
 import axios from 'axios'
 
@@ -19,11 +20,14 @@ import axios from 'axios'
     const [showAddForm, setShowAddForm] = useState(false);
 
     const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
-  
+    const params = useParams();
+    const jurusan = params?.jurusan as string;
+    const kelas = params?.kelas as string;
+
     useEffect(() => {
       const fetchStudents = async () => {
         try {
-          const response = await axios.get(`${baseURL}siswa`);
+          const response = await axios.get(`${baseURL}/siswa/${jurusan}/${kelas}`);
           setStudents(response.data.data);
           setTotalItems(response.data.data.length);
         } catch (error) {
@@ -41,14 +45,13 @@ import axios from 'axios'
         const query = searchQuery.toLowerCase();
         result = result.filter(student =>
           student.nama.toLowerCase().includes(query) ||
-          student.nisn.toLowerCase().includes(query) ||
+          student.nis.toLowerCase().includes(query) ||
           (student.rfid && student.rfid.toLowerCase().includes(query)) ||
-          student.kelas.toLowerCase().includes(query) ||
-          (student.kelas_paralel && student.kelas_paralel.toLowerCase().includes(query)) ||
-          student.jurusan.toLowerCase().includes(query)
+          student.kelas_id ||
+          student.pararel_id ||
+          student.jurusan_id
         );
       }
-  
       setTotalItems(result.length);
   
       const startIndex = (currentPage - 1) * itemsPerPage;
