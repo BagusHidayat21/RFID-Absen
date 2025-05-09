@@ -1,6 +1,6 @@
 // StudentTable.tsx
 import Link from 'next/link';
-import { useParams } from 'next/navigation'; 
+import { useParams, usePathname } from 'next/navigation'; 
 import axios from 'axios';
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Filter, ChevronDown, Search } from 'lucide-react';
@@ -18,9 +18,12 @@ const StudentTable: React.FC<StudentTableProps> = ({
   onItemsPerPageChange,
   onSearch,
   onAddStudent,
+  showAddButton = true,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
+  const pathname = usePathname();
+  const isAbsenPage = pathname.includes('/absen');
 
   const handleClassChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedClass(event.target.value);
@@ -65,14 +68,19 @@ const StudentTable: React.FC<StudentTableProps> = ({
             <option value="D">D</option>
           </select>
         </div>
-
-        <Link href={`/datasiswa/${jurusan}/${kelas}/tambahsiswa`}>
+        
+        {showAddButton !== false&& (
+        <Link href={isAbsenPage
+          ?`/absen/${jurusan}/${kelas}/tambahsiswa`
+          :`/datasiswa/${jurusan}/${kelas}/tambahsiswa`
+        }>
         <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center transition-colors">
           <span className="mr-1">+</span> Tambahkan Siswa
         </button>
         </Link>
+        )}
       </div>
-
+        
       {/* Table section */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
@@ -81,9 +89,11 @@ const StudentTable: React.FC<StudentTableProps> = ({
               <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 No.
               </th>
+              {!isAbsenPage && (
               <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 NISN
               </th>
+              )}
               <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 NAMA
               </th>
@@ -99,6 +109,11 @@ const StudentTable: React.FC<StudentTableProps> = ({
               <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 AKSI
               </th>
+              {isAbsenPage &&(
+              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                STATUS
+              </th>
+              )}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">

@@ -8,6 +8,7 @@ import Sidebar from '@/components/Sidebar';
 import { IoCubeOutline } from 'react-icons/io5';
 import Jurusan from '@/components/Jurusan';
 
+
 export default function JurusanDetailPage() {
   const params = useParams();
   const jurusan = params?.jurusan as string;

@@ -17,10 +17,10 @@ export default function Home() {
     { id: 1, type: "n1", title: "TEI", count: "-- 31 Siswa", rombel:"-- rombel", icon: Icons.all, slug: "TEI" },
     { id: 2, type: "n2", title: "TKP", count: "-- 1 Siswa", rombel:"-- rombel", icon: Icons.all, slug: "TKP" },
     { id: 3, type: "n3", title: "TOI", count: "-- 1 Siswa", rombel:"-- rombel", icon: Icons.all, slug: "TOI" },
-    { id: 4, type: "n4", title: "PENGELASAN", count: "-- 1 Siswa", rombel:"-- rombel", icon: Icons.all, slug: "PENGELASAN" },
+    { id: 4, type: "n4", title: "TLAS", count: "-- 1 Siswa", rombel:"-- rombel", icon: Icons.all, slug: "TLAS" },
     { id: 5, type: "n1", title: "DPIB", count: "-- 31 Siswa", rombel:"-- rombel", icon: Icons.all, slug: "DPIB" },
     { id: 6, type: "n2", title: "RPL", count: "-- 1 Siswa", rombel:"-- rombel", icon: Icons.all, slug: "RPL" },
-    { id: 7, type: "n3", title: "PERMESINAN", count: "-- 1 Siswa", rombel:"-- rombel", icon: Icons.all, slug: "PERMESINAN" },
+    { id: 7, type: "n3", title: "TPM", count: "-- 1 Siswa", rombel:"-- rombel", icon: Icons.all, slug: "TPM" },
     { id: 8, type: "n4", title: "TSM", count: "-- 1 Siswa", rombel:"-- rombel", icon: Icons.all, slug: "TSM" },
     { id: 9, type: "n1", title: "TPTU", count: "-- 31 Siswa", rombel:"-- rombel", icon: Icons.all, slug: "TPU" }
   ];

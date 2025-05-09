@@ -77,6 +77,7 @@ export interface StudentTableProps {
   totalPages: number;
   totalItems: number;
   itemsPerPage: number;
+  showAddButton?: boolean;
   onPageChange: (page: number) => void;
   onItemsPerPageChange: (itemsPerPage: number) => void;
   onSearch: (query: string) => void;
