@@ -1,13 +1,14 @@
 "use client";
-
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Sidebar from "@/components/Sidebar";
 import Card from "@/components/Card";
 import Topbar from "@/components/Header";
-import { AttendanceItem, PieChartDatum, CenterTextProps, DataType } from "@/types";
+import { AttendanceItem, PieChartDatum, MyResponsiveBarProps, CenterTextProps } from "@/types";
 import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
 
-// Icons
+// Icons for attendance status
 const Icons = {
   present: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -38,19 +39,8 @@ const Icons = {
   ),
 };
 
-// Modified pieData format to match Nivo's expected format
-const pieData = [
-  { id: 'Hadir', label: 'Hadir', value: 40, color: '#64B5F6' },
-  { id: 'Izin', label: 'Izin', value: 25, color: '#81C784' },
-  { id: 'Sakit', label: 'Sakit', value: 20, color: '#F48FB1' },
-  { id: 'Tanpa Keterangan', label: 'Tanpa Keterangan', value: 15, color: '#FFB74D' },
-];
-
-// Calculate total for center text
-const totalAttendance = pieData.reduce((sum, item) => sum + item.value, 0);
-
-// Custom layer component for center text
-const CenterText = ({ centerX, centerY }: CenterTextProps) => {
+// Custom layer component for center text in pie chart
+const CenterText = ({ centerX, centerY, labelTop, labelBottom }: CenterTextProps) => {
   return (
     <g>
       <text
@@ -60,7 +50,7 @@ const CenterText = ({ centerX, centerY }: CenterTextProps) => {
         dominantBaseline="central"
         style={{ fontSize: '14px', fontWeight: 'bold' }}
       >
-        Keterangan
+        {labelTop}
       </text>
       <text
         x={centerX}
@@ -69,40 +59,97 @@ const CenterText = ({ centerX, centerY }: CenterTextProps) => {
         dominantBaseline="central"
         style={{ fontSize: '18px' }}
       >
-        {totalAttendance}
+        {labelBottom}
       </text>
     </g>
   );
 };
 
-// Bar chart data
-const barData = [
-  { month: 'Januari', 'Siswa Hadir': 1400, 'Siswa Absen': 1200 },
-  { month: 'Februari', 'Siswa Hadir': 1700, 'Siswa Absen': 1100 },
-  { month: 'Maret', 'Siswa Hadir': 500, 'Siswa Absen': 2200 },
-  { month: 'April', 'Siswa Hadir': 1600, 'Siswa Absen': 600 },
-  { month: 'May', 'Siswa Hadir': 1200, 'Siswa Absen': 1100 },
-  { month: 'Juni', 'Siswa Hadir': 1600, 'Siswa Absen': 1300 },
-  { month: 'Juli', 'Siswa Hadir': 2100, 'Siswa Absen': 1100 },
-  { month: 'Agustus', 'Siswa Hadir': 2100, 'Siswa Absen': 1100 },
-  { month: 'September', 'Siswa Hadir': 2000, 'Siswa Absen': 1100 },
-  { month: 'November', 'Siswa Hadir': 2100, 'Siswa Absen': 1100 },
-  { month: 'Desember', 'Siswa Hadir': 2100, 'Siswa Absen': 1100 },
-];
+// Define the type for bar chart data
+type BarChartData = {
+  month: string;
+  'Siswa Hadir': number;
+  'Siswa Absen': number;
+};
+
+// Pie chart component
+const MyResponsivePie = ({
+  data,
+  totalAttendance
+}: { data: PieChartDatum[], totalAttendance: number }) => (
+  <ResponsivePie
+    data={data}
+    margin={{ top: 10, right: 80, bottom: 40, left: 5 }}
+    innerRadius={0.6}
+    padAngle={0}
+    cornerRadius={0}
+    colors={{ datum: 'data.color' }}
+    activeOuterRadiusOffset={8}
+    borderWidth={0}
+    enableArcLinkLabels={false}
+    arcLabelsSkipAngle={10}
+    arcLabelsTextColor="#fff"
+    layers={[
+      'arcs',
+      'arcLabels',
+      'legends',
+      (props) => (
+        <CenterText
+          {...props}
+          labelTop="Keterangan"
+          labelBottom={totalAttendance}
+        />
+      )
+    ]}
+    legends={[
+      {
+        anchor: 'right',
+        direction: 'column',
+        translateX: 70,
+        itemsSpacing: 12,
+        itemWidth: 80,
+        itemHeight: 18,
+        itemTextColor: '#333',
+        symbolSize: 12,
+        symbolShape: 'circle',
+        effects: [
+          {
+            on: 'hover',
+            style: {
+              itemTextColor: '#000'
+            }
+          }
+        ]
+      }
+    ]}
+    theme={{
+      legends: {
+        text: {
+          fontSize: 12
+        }
+      },
+      labels: {
+        text: {
+          fontSize: 11,
+          fontWeight: 'bold'
+        }
+      }
+    }}
+  />
+);
 
 // Bar chart component
-const MyResponsiveBar = () => (
+const MyResponsiveBar = ({ data }: MyResponsiveBarProps) => (
   <ResponsiveBar
-    data={barData}
+    data={data}
     keys={['Siswa Hadir', 'Siswa Absen']}
     indexBy="month"
-    // Margin minimal untuk memberi ruang maksimum pada chart
     margin={{ top: 20, right: 5, bottom: 100, left: 60 }}
-    padding={0.3}
-    layout="vertical" // Memastikan tata letak vertikal
+    padding={0.5}
+    layout="vertical"
     valueScale={{ type: 'linear' }}
     indexScale={{ type: 'band', round: true }}
-    colors={['#64B5F6', '#4ade80']}
+    colors={['#64B5F6', '#E57373']}
     borderRadius={3}
     borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
     axisTop={null}
@@ -111,31 +158,27 @@ const MyResponsiveBar = () => (
       tickSize: 5,
       tickPadding: 8,
       tickRotation: 0,
-      legend: '',
+      legend: 'Bulan',
       legendPosition: 'middle',
       legendOffset: 42,
-      truncateTickAt: 0,
-      // Alternatif: gunakan formatter untuk memendekkan label jika perlu
-      format: value => value.substring(0, 3)
+      truncateTickAt: 0
     }}
     axisLeft={{
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: '',
+      legend: 'Jumlah Siswa',
       legendPosition: 'middle',
       legendOffset: -45,
-      format: v => `${v/1000}k`,
       truncateTickAt: 0
     }}
     enableGridY={true}
     enableGridX={false}
     gridYValues={5}
-    enableLabel={false}
+    enableLabel={true}
     labelSkipWidth={12}
     labelSkipHeight={12}
     labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-    // Membuat legenda lebih responsif
     legends={[
       {
         dataFrom: 'keys',
@@ -181,121 +224,190 @@ const MyResponsiveBar = () => (
   />
 );
 
-// Pie chart component
-const MyResponsivePie = ({ data }: { data: PieChartDatum[] }) => (
-  <ResponsivePie
-    data={data}
-    // Mengubah margin untuk mengoptimalkan ruang
-    margin={{ top: 10, right: 80, bottom: 40, left: 5 }}
-    innerRadius={0.6}
-    padAngle={0}
-    cornerRadius={0}
-    colors={{ datum: 'data.color' }}
-    activeOuterRadiusOffset={8}
-    borderWidth={0}
-    enableArcLinkLabels={false}
-    arcLabelsSkipAngle={10}
-    arcLabelsTextColor="#fff"
-    layers={['arcs', 'arcLabels', 'legends', CenterText]}
-    // Mengubah posisi legenda untuk mengoptimalkan tampilan
-    legends={[
-      {
-        anchor: 'right',
-        direction: 'column',
-        justify: false,
-        translateX: 70,
-        translateY: 0,
-        itemsSpacing: 12,
-        itemWidth: 80,
-        itemHeight: 18,
-        itemTextColor: '#333',
-        itemDirection: 'left-to-right',
-        itemOpacity: 1,
-        symbolSize: 12,
-        symbolShape: 'circle',
-        symbolSpacing: 6,
-        effects: [
-          {
-            on: 'hover',
-            style: {
-              itemTextColor: '#000'
-            }
-          }
-        ]
-      }
-    ]}
-    theme={{
-      legends: {
-        text: {
-          fontSize: 12
-        }
-      },
-      labels: {
-        text: {
-          fontSize: 11,
-          fontWeight: 'bold'
-        }
-      }
-    }}
-  />
-);
-
 export default function AttendancePage() {
-  const attendanceData: AttendanceItem[] = [
-    { id: 1, type: "present", title: "Masuk", count: "31 Siswa", icon: Icons.present },
-    { id: 2, type: "leave", title: "Izin", count: "1 Siswa", icon: Icons.leave },
-    { id: 3, type: "sick", title: "Sakit", count: "1 Siswa", icon: Icons.sick },
-    { id: 4, type: "absent", title: "Tanpa Keterangan", count: "1 Siswa", icon: Icons.absent },
-  ];
+  const [loading, setLoading] = useState<boolean>(true);
+  const [pieData, setPieData] = useState<PieChartDatum[]>([]);
+  const [barData, setBarData] = useState<BarChartData[]>([]);
+  const [totalAttendance, setTotalAttendance] = useState<number>(0);
+  const [attendanceData, setAttendanceData] = useState<AttendanceItem[]>([]);
+  
+  // Fix: Use a hardcoded API URL or properly set environment variable
+  // Option 1: Hardcoded API URL (for development)
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  
+  // Fetch attendance data from the database
+  useEffect(() => {
+    const fetchAttendanceData = async () => {
+      try {
+        setLoading(true);
+        
+        console.log("API URL:", `${baseURL}/absen`); // Debug: Log the API URL
+        
+        // Menggunakan axios untuk mengambil data keseluruhan
+        const response = await axios.get(`${baseURL}/absen`);      
+        
+        const data = response.data.data;
 
+        // Process data for cards
+        const presentCount = data.filter((item: any) => item.status === "Hadir").length;
+        const leaveCount = data.filter((item: any) => item.status === "Izin").length;
+        const sickCount = data.filter((item: any) => item.status === "Sakit").length;
+        const absentCount = data.filter((item: any) => item.status === "Tanpa Keterangan").length;
+
+        // Calculate total students
+        const totalStudents = presentCount + leaveCount + sickCount + absentCount;
+
+        const cardData: AttendanceItem[] = [
+          { 
+            id: 1, 
+            type: "present", 
+            title: "Masuk", 
+            count: `${presentCount} Siswa`, 
+            icon: Icons.present 
+          },
+          { 
+            id: 2, 
+            type: "leave", 
+            title: "Izin", 
+            count: `${leaveCount} Siswa`, 
+            icon: Icons.leave 
+          },
+          { 
+            id: 3, 
+            type: "sick", 
+            title: "Sakit", 
+            count: `${sickCount} Siswa`, 
+            icon: Icons.sick 
+          },
+          { 
+            id: 4, 
+            type: "absent", 
+            title: "Tanpa Keterangan", 
+            count: `${absentCount} Siswa`, 
+            icon: Icons.absent 
+          },
+        ];
+
+        // Process data for pie chart
+        const chartData: PieChartDatum[] = [
+          { id: 'Hadir', label: 'Hadir', value: presentCount, color: '#64B5F6' },
+          { id: 'Izin', label: 'Izin', value: leaveCount, color: '#81C784' },
+          { id: 'Sakit', label: 'Sakit', value: sickCount, color: '#FFB74D' },
+          { id: 'Tanpa Keterangan', label: 'Tanpa Keterangan', value: absentCount, color: '#E57373' },
+        ];
+        
+        // Create data for bar chart
+        // Create monthly data (using current date to show monthly attendance trends)
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth();
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        // Create only current month data for the bar chart
+        const barChartData: BarChartData[] = [];
+        const monthName = monthNames[currentMonth];
+        
+        // Add only current month data
+        barChartData.push({
+          month: monthName,
+          'Siswa Hadir': presentCount,
+          'Siswa Absen': leaveCount + sickCount + absentCount
+        });
+        
+        // Update state
+        setAttendanceData(cardData);
+        setPieData(chartData);
+        setBarData(barChartData);
+        setTotalAttendance(totalStudents);
+    
+      } catch (error) {
+        console.error('Error fetching attendance data:', error);
+        // Set fallback data in case of error
+        setAttendanceData([
+          { id: 1, type: "present", title: "Masuk", count: "0 Siswa", icon: Icons.present },
+          { id: 2, type: "leave", title: "Izin", count: "0 Siswa", icon: Icons.leave },
+          { id: 3, type: "sick", title: "Sakit", count: "0 Siswa", icon: Icons.sick },
+          { id: 4, type: "absent", title: "Tanpa Keterangan", count: "0 Siswa", icon: Icons.absent },
+        ]);
+        setPieData([
+          { id: 'Hadir', label: 'Hadir', value: 0, color: '#64B5F6' },
+          { id: 'Izin', label: 'Izin', value: 0, color: '#81C784' },
+          { id: 'Sakit', label: 'Sakit', value: 0, color: '#FFB74D' },
+          { id: 'Tanpa Keterangan', label: 'Tanpa Keterangan', value: 0, color: '#E57373' },
+        ]);
+        
+        // Add fallback bar data - only current month
+        const currentMonth = new Date().getMonth();
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        setBarData([
+          { month: monthNames[currentMonth], 'Siswa Hadir': 0, 'Siswa Absen': 0 },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAttendanceData();
+  }, []);
+  
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <Sidebar />
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Topbar */}
         <Topbar user={{ name: "Musfiq", role: "Guru" }} />
-
         {/* Page Content */}
         <main className="flex-1 p-6 overflow-y-auto">
-          <div className=" mx-auto my-auto bg-white rounded-xl shadow-lg p-6">
+          <div className="mx-auto my-auto bg-white rounded-xl shadow-lg p-6">
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
-              <h1 className="text-xl font-semibold text-gray-900">Absensi Kehadiran</h1>
-              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm">
-                Bulan & Tahun
-              </button>
+              <h1 className="text-xl font-semibold text-gray-900">Absensi Kehadiran Keseluruhan</h1>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              {attendanceData.map((item) => (
-                <Card
-                  key={item.id}
-                  type={item.type}
-                  title={item.title}
-                  count={item.count}
-                  icon={item.icon}
-                />
-              ))}
-            </div>
-            <div className="flex flex-col md:flex-row gap-8 mt-8">
-
-              {/* Bar Chart */}
-              <div className="w-full md:w-[55%] h-[500px] bg-white rounded-lg p-5">
-                <h3 className="text-lg font-semibold text-gray-800 mb-6">Total Kehadiran</h3>
-                <div className="h-[300px] w-full">
-                  <MyResponsiveBar />
-                </div>
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <p className="text-gray-500">Memuat data...</p>
               </div>
-
-              {/* Pie Chart */}
-              <div className="w-full md:w-[45%] h-[500px] bg-white rounded-lg p-5">
-                <h3 className="text-lg font-semibold text-gray-800 mb-6">Distribusi Kehadiran</h3>
-                <div className="h-[250px] w-full">
-                  <MyResponsivePie data={pieData} />
+            ) : (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                  {attendanceData.map((item) => (
+                    <Card
+                      key={item.id}
+                      type={item.type}
+                      title={item.title}
+                      count={item.count}
+                      icon={item.icon}
+                    />
+                  ))}
                 </div>
-              </div>
-            </div>
+                <div className="flex flex-col md:flex-row gap-8 mt-8">
+                  {/* Bar Chart */}
+                  <div className="w-full md:w-[55%] h-[500px] bg-white rounded-lg p-5">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-6">Total Kehadiran Bulan Ini</h3>
+                    <div className="h-[300px] w-full">
+                      {barData.length > 0 ? (
+                        <MyResponsiveBar data={barData} />
+                      ) : (
+                        <div className="flex justify-center items-center h-full">
+                          <p className="text-gray-500">Data grafik tidak tersedia</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {/* Pie Chart */}
+                  <div className="w-full md:w-[45%] h-[500px] bg-white rounded-lg p-5">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-6">Distribusi Kehadiran</h3>
+                    <div className="h-[250px] w-full">
+                      <MyResponsivePie 
+                        data={pieData} 
+                        totalAttendance={totalAttendance}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </main>
       </div>

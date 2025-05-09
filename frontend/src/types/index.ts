@@ -104,6 +104,8 @@ export type DataType = {
 export interface CenterTextProps {
   centerX: number;
   centerY: number;
+  labelTop: string;
+  labelBottom: string | number;
 }
 
 
@@ -119,4 +121,12 @@ export interface StudentFormData {
   kelas_id: number;
   jurusan_id: number;
   pararel_id: number;
+}
+
+export interface BarDatum {
+  [key: string]: string | number;
+}
+
+export interface MyResponsiveBarProps {
+  data: BarDatum[];
 }
