@@ -1,6 +1,6 @@
 import { JurusanProps } from '@/types';
 
-const Jurusan: React.FC<JurusanProps> = ({ type, title, count, rombel, icon }) => {
+const Jurusan: React.FC<JurusanProps> = ({ type, title, icon }) => {
   const cardStyles = {
     n1: { card: 'bg-pink-50', icon: 'bg-pink-400 text-white' },
     n2: { card: 'bg-amber-50', icon: 'bg-amber-300 text-white' },
@@ -16,8 +16,6 @@ const Jurusan: React.FC<JurusanProps> = ({ type, title, count, rombel, icon }) =
         {icon}
       </div>
       <div className="text-lg font-semibold text-gray-800 mb-1">{title}</div>
-      <div className="text-sm text-gray-600">{rombel}</div>
-      <div className="text-sm text-gray-600">{count}</div>
     </div>
   );
 };

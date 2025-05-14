@@ -1,3 +1,4 @@
+"use client"
 import { useState } from 'react';
 import { useParams } from 'next/navigation'; // ✅ gunakan ini di App Router
 import { StudentFormData } from '@/types/index';
@@ -9,14 +10,21 @@ export default function StudentDataForm({ onSubmit, onCancel }: StudentDataFormP
     nis: '',
     rfid_uid: 0,
     nama: '',
-    kelas_id: 0,
-    jurusan_id: 0,
-    pararel_id: 0
+    kelas: 0,
+    jurusan: 0,
+    pararel: 0
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Konversi nilai sesuai dengan tipe data yang dibutuhkan
+    if (name === 'rfid_uid' || name === 'kelas' || name === 'jurusan' || name === 'pararel') {
+      const numValue = value === '' ? 0 : Number(value);
+      setFormData(prev => ({ ...prev, [name]: numValue }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = () => {
@@ -26,14 +34,25 @@ export default function StudentDataForm({ onSubmit, onCancel }: StudentDataFormP
   };
 
   const handleCancel = () => {
+    // Reset form data to initial state
+    setFormData({
+      nis: '',
+      rfid_uid: 0,
+      nama: '',
+      kelas: 0,
+      jurusan: 0,
+      pararel: 0
+    });
+    
+    // Call onCancel if provided
     if (onCancel) {
       onCancel();
     }
   };
 
   const params = useParams();
-    const jurusan = params?.jurusan as string;
-    const kelas = params?.kelas as string;
+    const jurusanParam = params?.jurusan as string;
+    const kelasParam = params?.kelas as string;
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-sm">
@@ -45,7 +64,7 @@ export default function StudentDataForm({ onSubmit, onCancel }: StudentDataFormP
           <div>
             <input
               type="text"
-              name="nisn"
+              name="nis"
               placeholder="NISN"
               value={formData.nis}
               onChange={handleChange}
@@ -56,11 +75,10 @@ export default function StudentDataForm({ onSubmit, onCancel }: StudentDataFormP
           <div>
             <input
               type="text"
-              name="rfid"
+              name="rfid_uid"
               placeholder="RFID"
               value={formData.rfid_uid}
               onChange={handleChange}
-              disabled
               className="w-full px-4 py-2 border border-gray-300 rounded text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"
             />
           </div>
@@ -68,7 +86,7 @@ export default function StudentDataForm({ onSubmit, onCancel }: StudentDataFormP
           <div>
             <input
               type="text"
-              name="fullName"
+              name="nama"
               placeholder="Nama Siswa"
               value={formData.nama}
               onChange={handleChange}
@@ -81,12 +99,12 @@ export default function StudentDataForm({ onSubmit, onCancel }: StudentDataFormP
         <div className="space-y-4">
           <div className="relative">
             <select
-              name="department"
-              value={formData.kelas_id}
+              name="jurusan"
+              value={formData.jurusan}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 appearance-none"
             >
-              <option value="" disabled>{jurusan}</option>
+              <option value="">{jurusanParam}</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -97,12 +115,12 @@ export default function StudentDataForm({ onSubmit, onCancel }: StudentDataFormP
           
           <div className="relative">
             <select
-              name="grade"
-              value={formData.jurusan_id}
+              name="kelas"
+              value={formData.kelas}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 appearance-none"
             >
-              <option value="" disabled>{kelas}</option>
+              <option value="">{kelasParam}</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -113,8 +131,8 @@ export default function StudentDataForm({ onSubmit, onCancel }: StudentDataFormP
           
           <div className="relative">
             <select
-              name="parallelClass"
-              // value={formData.pararel_id}
+              name="pararel"
+              value={formData.pararel}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 appearance-none"
             >
@@ -151,5 +169,3 @@ export default function StudentDataForm({ onSubmit, onCancel }: StudentDataFormP
     </div>
   );
 }
-
-

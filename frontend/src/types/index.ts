@@ -38,16 +38,12 @@ export interface CardProps {
 export interface JurusanProps {
   type: CardType;
   title: string;
-  count: string;
-  rombel: string;
   icon: ReactNode;
 }
 export type Faculty = {
   id: number;
   type: CardType
   title: string;
-  count: string;
-  rombel: string;
   icon: ReactNode;
   slug: string;
 };
@@ -55,24 +51,22 @@ export type Class = {
   id: number;
   type: 'n1' | 'n2' | 'n3' | 'n4';
   title: string;
-  count: string;
-  rombel: string;
   icon: ReactNode;
   slug: string;
 };
 
 //Absen
-export type Students = {
+export type getStudents = {
   id?: number;
   nis: string;
   nama: string;
   rfid: string;
-  jurusan_id: string;
-  kelas_id: string;
-  pararel_id: string;
+  jurusan: string;
+  kelas: string;
+  pararel: string;
 };
 export interface StudentTableProps {
-  students: Students[];
+  students: getStudents[];
   currentPage: number;
   totalPages: number;
   totalItems: number;
@@ -118,9 +112,9 @@ export interface StudentFormData {
   nis: string;
   rfid_uid: number;
   nama: string;
-  kelas_id: number;
-  jurusan_id: number;
-  pararel_id: number;
+  kelas: number;
+  jurusan: number;
+  pararel: number;
 }
 
 export interface BarDatum {

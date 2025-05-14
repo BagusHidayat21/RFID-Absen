@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation'; 
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Filter, ChevronDown, Search } from 'lucide-react';
 import Button from './Button';
 import { StudentTableProps } from '@/types/index';
@@ -22,17 +22,38 @@ const StudentTable: React.FC<StudentTableProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
+  const [rowsPerPageOpen, setRowsPerPageOpen] = useState(false);
   const pathname = usePathname();
   const isAbsenPage = pathname.includes('/absen');
 
+    // Available options for rows per page
+    const rowsPerPageOptions = [5, 10, 20, 50];
+
+    // Handle class filter change
   const handleClassChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedClass(event.target.value);
   };
 
-  const filteredStudents = students.filter(student => !selectedClass);
+  // Filter students based on selected class
+  const filteredStudents = selectedClass 
+    ? students.filter(student => student.pararel === selectedClass) 
+    : students;
+
   const params = useParams();
   const jurusan = params?.jurusan as string;
   const kelas = params?.kelas as string;
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setRowsPerPageOpen(false);
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="w-full bg-white rounded-lg shadow-sm overflow-hidden">
@@ -55,13 +76,13 @@ const StudentTable: React.FC<StudentTableProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-700">Sort by:</span>
+          <span className="text-sm font-medium text-gray-700">Filter kelas:</span>
           <select
             value={selectedClass}
             onChange={handleClassChange}
             className="block w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="">All Classes</option>
+            <option value="">Semua Kelas</option>
             <option value="A">A</option>
             <option value="B">B</option>
             <option value="C">C</option>
@@ -69,7 +90,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
           </select>
         </div>
         
-        {showAddButton !== false&& (
+        {showAddButton !== false && (
         <Link href={isAbsenPage
           ?`/absen/${jurusan}/${kelas}/tambahsiswa`
           :`/datasiswa/${jurusan}/${kelas}/tambahsiswa`
@@ -109,7 +130,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
               <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 AKSI
               </th>
-              {isAbsenPage &&(
+              {isAbsenPage && (
               <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 STATUS
               </th>
@@ -120,24 +141,31 @@ const StudentTable: React.FC<StudentTableProps> = ({
             {filteredStudents.length > 0 ? (
               filteredStudents.map((student, index) => (
                 <tr key={student.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
+                  {!isAbsenPage && (
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.nis}</td>
+                  )}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.nama}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">{student.kelas_id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">{student.pararel_id || '-'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">{student.jurusan_id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">{student.kelas}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">{student.pararel || '-'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">{student.jurusan}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">
                     <Button variant='edit' className="mr-2">Edit</Button>
                     <Button variant='hapus'>Hapus</Button>
                   </td>
+                  {isAbsenPage && (
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">
+                    {student.pararel || '-'}
+                  </td>
+                  )}
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="px-6 py-4 text-center text-sm text-gray-500">
-                  No data available
+                <td colSpan={isAbsenPage ? 7 : 8} className="px-6 py-4 text-center text-sm text-gray-500">
+                  Tidak ada data tersedia
                 </td>
               </tr>
             )}
@@ -168,24 +196,57 @@ const StudentTable: React.FC<StudentTableProps> = ({
           </button>
         </div>
         <div className="text-sm text-gray-700 mt-2 sm:mt-0">
-          {currentPage}-{itemsPerPage} of {totalItems}
+          Menampilkan {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)} - {Math.min(currentPage * itemsPerPage, totalItems)} dari {totalItems} data
         </div>
         <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-end">
           <div className="flex gap-2 items-center">
-            <span className="text-sm text-gray-700">Rows per page:</span>
+            <span className="text-sm text-gray-700">Data per halaman:</span>
             <div className="relative inline-block text-left">
               <div>
                 <button
                   type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setRowsPerPageOpen(!rowsPerPageOpen);
+                  }}
                   className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
                   id="menu-button"
-                  aria-expanded="true"
+                  aria-expanded={rowsPerPageOpen}
                   aria-haspopup="true"
                 >
                   {itemsPerPage}
                   <ChevronDown className="ml-2 h-4 w-4" />
                 </button>
               </div>
+
+              {/* Dropdown menu for rows per page */}
+              {rowsPerPageOpen && (
+                <div 
+                  className="origin-top-right absolute right-0 mt-2 w-24 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="menu-button"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="py-1" role="none">
+                    {rowsPerPageOptions.map((option) => (
+                      <button
+                        key={option}
+                        onClick={() => {
+                          onItemsPerPageChange(option);
+                          setRowsPerPageOpen(false);
+                        }}
+                        className={`block px-4 py-2 text-sm w-full text-left ${
+                          itemsPerPage === option ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50'
+                        }`}
+                        role="menuitem"
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <div className="flex items-center ml-4">
