@@ -17,6 +17,7 @@ const StudentPage: React.FC = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingStudent, setEditingStudent] = useState<getStudents | null>(null);
 
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
   const params = useParams();
@@ -101,6 +102,24 @@ const StudentPage: React.FC = () => {
     setShowAddForm(false);
   };
 
+  const handleEditStudent = (student: getStudents) => {
+    setEditingStudent(student);
+  };
+
+  const handleEditFormSubmit = (editedStudent: Omit<getStudents, 'id'>) => {
+    const studentWithId: getStudents = {
+      ...editedStudent,
+      id: editingStudent!.id
+    };
+
+    setStudents(prev => prev.map(s => s.id === studentWithId.id ? studentWithId : s));
+    setEditingStudent(null);
+  };
+
+  const handleDeleteStudent = (id: number) => {
+    setStudents(prev => prev.filter(s => s.id !== id));
+  };
+
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   
   return (
@@ -110,19 +129,23 @@ const StudentPage: React.FC = () => {
         <Topbar user={{ name: "Bagus", role: "Admin" }} />
         <main className="flex-1 p-6 overflow-y-auto">
           <div className="bg-white rounded-2xl shadow p-6">
-            <StudentTable
-              students={filteredStudents}
-              absensi={absensi}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
-              onPageChange={handlePageChange}
-              onItemsPerPageChange={handleItemsPerPageChange}
-              onSearch={handleSearch}
-              onAddStudent={handleAddStudent}
-              showAddButton={false}
-            />
+          <StudentTable
+            students={filteredStudents}
+            absensi={absensi}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            onSearch={handleSearch}
+            onAddStudent={handleAddStudent}
+            onDeleteStudent={handleDeleteStudent}
+            onEditStudent={handleEditStudent}
+            editingStudent={editingStudent}
+            onEditFormSubmit={handleEditFormSubmit}
+            showAddButton={false}
+          />
           </div>
         </main>
       </div>
