@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Topbar from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import StudentDataForm from '@/components/Form';
@@ -9,18 +9,32 @@ import type { StudentFormData } from '@/types/index';
 
 export default function TambahSiswaPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const handleSubmit = async (data: StudentFormData) => {
     try {
       const jurusanResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/jurusan/${data.jurusan_id}`);
       const kelasResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/kelas/${data.kelas_id}`);
-      
+
       const jurusan = jurusanResponse.data.data.nama;
       const kelas = kelasResponse.data.data.nama;
-      
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/siswa`, data);
-      if (response.status === 201) {
-        router.push(`/datasiswa/${jurusan}/${kelas}`);
+
+      const isEditPage = pathname.includes('/edit');
+      const id = searchParams.get('id');
+
+      if (jurusan && kelas && isEditPage && id) {
+        // Jalankan PUT
+        const response = await axios.put(`${process.env.NEXT_PUBLIC_API_BASE_URL}/siswa/${id}`, data);
+        if (response.status === 200) {
+          router.push(`/datasiswa/${jurusan}/${kelas}`);
+        }
+      } else {
+        // Jalankan POST
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/siswa`, data);
+        if (response.status === 201) {
+          router.push(`/datasiswa/${jurusan}/${kelas}`);
+        }
       }
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -43,4 +57,3 @@ export default function TambahSiswaPage() {
     </div>
   );
 }
-

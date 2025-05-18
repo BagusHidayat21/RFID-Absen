@@ -65,17 +65,36 @@ export type getStudents = {
   kelas: string;
   pararel: string;
 };
+
 export interface StudentTableProps {
   students: getStudents[];
+  absensi: Absensi[];
   currentPage: number;
   totalPages: number;
   totalItems: number;
   itemsPerPage: number;
   showAddButton?: boolean;
+  onDeleteStudent: (id: number) => void;
+  onEditStudent: (student: getStudents) => void;
+  editingStudent: getStudents | null;
+  onEditFormSubmit: (editedStudent: Omit<getStudents, 'id'>) => void;
   onPageChange: (page: number) => void;
   onItemsPerPageChange: (itemsPerPage: number) => void;
   onSearch: (query: string) => void;
   onAddStudent: () => void;
+}
+
+//Absensi
+export interface Absensi {
+  id: number;
+  siswa_id: number;
+  nama: string;
+  nis: string;
+  kelas: string;
+  tanggal: string;
+  jam: string;
+  status: string;
+  keterangan: string | null;
 }
 
 // Pie Chart
@@ -104,17 +123,18 @@ export interface CenterTextProps {
 
 
 export interface StudentDataFormProps {
-  onSubmit?: (data: StudentFormData) => void;
-  onCancel?: () => void;
+  onSubmit: (data: StudentFormData) => void;
+  onCancel: () => void;
+  initialData?: StudentFormData; 
 }
 
 export interface StudentFormData {
   nis: string;
   rfid_uid: number;
   nama: string;
-  kelas: number;
-  jurusan: number;
-  pararel: number;
+  kelas_id: number;
+  jurusan_id: number;
+  pararel_id: number;
 }
 
 export interface BarDatum {

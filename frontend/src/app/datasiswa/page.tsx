@@ -23,13 +23,6 @@ export default function Home() {
     all: <IoCubeOutline size={24} color="white" />
   };
 
-  const months = [
-    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-  ];
-
-  const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i);
-
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
   const endpoint = "/jurusan";
 
@@ -115,50 +108,6 @@ export default function Home() {
           <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-6">
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
               <h1 className="text-xl font-semibold text-gray-900">Jurusan</h1>
-              
-              {/* Month & Year ComboBox */}
-              <div className="relative" ref={dropdownRef}>
-                <button 
-                  className="flex items-center justify-between gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm min-w-40"
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                >
-                  <span>{months[selectedMonth]} {selectedYear}</span>
-                  <IoChevronDown 
-                    size={16} 
-                    className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} 
-                  />
-                </button>
-                
-                {isDropdownOpen && (
-                  <div className="absolute right-0 z-10 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg w-64 py-2">
-                    <div className="px-3 py-2 font-medium text-gray-700 border-b border-gray-100">
-                      Pilih Bulan & Tahun
-                    </div>
-                    <div className="max-h-60 overflow-y-auto">
-                      {years.map(year => (
-                        <div key={year} className="px-3 py-2">
-                          <div className="font-medium text-gray-700">{year}</div>
-                          <div className="grid grid-cols-3 gap-1 mt-1">
-                            {months.map((month, idx) => (
-                              <button
-                                key={`${year}-${idx}`}
-                                onClick={() => handleMonthYearSelect(idx, year)}
-                                className={`text-xs p-1 rounded text-center ${
-                                  selectedMonth === idx && selectedYear === year
-                                    ? 'bg-blue-100 text-gray-900'
-                                    : 'hover:bg-gray-100 text-gray-900'
-                                }`}
-                              >
-                                {month.substring(0, 3)}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
             </div>
 
             {loading ? (

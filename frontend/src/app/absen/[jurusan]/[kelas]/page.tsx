@@ -5,12 +5,13 @@ import Sidebar from '@/components/Sidebar';
 import Topbar from '@/components/Header';
 import StudentTable from '@/components/StudentTable';
 import { useParams } from 'next/navigation'; 
-import { getStudents } from '@/types';
+import { getStudents, Absensi } from '@/types';
 import axios from 'axios';
 
 const StudentPage: React.FC = () => {
   const [students, setStudents] = useState<getStudents[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<getStudents[]>([]);
+  const [absensi, setAbsensi] = useState<Absensi[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
@@ -33,7 +34,17 @@ const StudentPage: React.FC = () => {
       }
     };
 
+    const fetchAbsensi = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/absen`);
+        setAbsensi(response.data.data);
+      } catch (error) {
+        console.error("Error fetching absensi:", error);
+      }
+    };
+
     fetchStudents();
+    fetchAbsensi();
   }, [baseURL, jurusan, kelas]);
 
   useEffect(() => {
@@ -96,11 +107,12 @@ const StudentPage: React.FC = () => {
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
       <div className="flex-1 flex flex-col">
-        <Topbar user={{ name: "User Name", role: "User Role" }} />
+        <Topbar user={{ name: "Bagus", role: "Admin" }} />
         <main className="flex-1 p-6 overflow-y-auto">
           <div className="bg-white rounded-2xl shadow p-6">
             <StudentTable
               students={filteredStudents}
+              absensi={absensi}
               currentPage={currentPage}
               totalPages={totalPages}
               totalItems={totalItems}

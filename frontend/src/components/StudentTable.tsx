@@ -1,7 +1,6 @@
 // StudentTable.tsx
 import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation'; 
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Filter, ChevronDown, Search } from 'lucide-react';
 import Button from './Button';
@@ -10,14 +9,18 @@ import { StudentTableProps } from '@/types/index';
 
 const StudentTable: React.FC<StudentTableProps> = ({
   students,
+  absensi,
   currentPage,
   totalPages,
   totalItems,
   itemsPerPage,
+  onDeleteStudent,
   onPageChange,
   onItemsPerPageChange,
   onSearch,
-  onAddStudent,
+  onEditStudent,
+  editingStudent,
+  onEditFormSubmit,
   showAddButton = true,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,6 +45,11 @@ const StudentTable: React.FC<StudentTableProps> = ({
   const params = useParams();
   const jurusan = params?.jurusan as string;
   const kelas = params?.kelas as string;
+
+  // Filter students based on absensi
+  const filteredAbsensi = isAbsenPage 
+    ? absensi.filter(absensi => filteredStudents.some(student => student.id === absensi.siswa_id)) 
+    : [];
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -105,71 +113,103 @@ const StudentTable: React.FC<StudentTableProps> = ({
       {/* Table section */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-indigo-50">
-            <tr>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                No.
-              </th>
-              {!isAbsenPage && (
+        <thead className="bg-indigo-50">
+          <tr>
+            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              No.
+            </th>
+            {!isAbsenPage && (
               <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 NISN
               </th>
-              )}
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                NAMA
-              </th>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                KELAS
-              </th>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                PARALLEL
-              </th>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                JURUSAN
-              </th>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                AKSI
-              </th>
-              {isAbsenPage && (
+            )}
+            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              NAMA
+            </th>
+            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              KELAS
+            </th>
+            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              PARALLEL
+            </th>
+            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              JURUSAN
+            </th>
+            {isAbsenPage && (
               <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 STATUS
               </th>
-              )}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredStudents.length > 0 ? (
-              filteredStudents.map((student, index) => (
+            )}
+            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              AKSI
+            </th>
+          </tr>
+        </thead>
+
+        <tbody className="bg-white divide-y divide-gray-200">
+          {filteredStudents.length > 0 ? (
+            filteredStudents.map((student, index) => {
+              const existingAbsen = absensi.find((absen) => absen.siswa_id === student.id);
+              let status = '-';
+              let borderColor = '';
+
+              if (existingAbsen) {
+                status = existingAbsen.status;
+                switch (status) {
+                  case 'Hadir':
+                    borderColor = 'border-green-500 bg-green-500 text-white';
+                    break;
+                  case 'Alpa':
+                    borderColor = 'border-red-500 bg-red-500 text-white';
+                    break;
+                  case 'Izin':
+                    borderColor = 'border-blue-500 bg-blue-500 text-white';
+                    break;
+                  case 'Sakit':
+                    borderColor = 'border-yellow-500 bg-yellow-500 text-white';
+                    break;
+                  default:
+                    borderColor = 'border-red-500 bg-red-500 text-white';
+                }
+              }
+
+              return (
                 <tr key={student.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
                   {!isAbsenPage && (
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.nis}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.nis}</td>
                   )}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.nama}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">{student.kelas}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">{student.pararel || '-'}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">{student.jurusan}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">
-                    <Button variant='edit' className="mr-2">Edit</Button>
-                    <Button variant='hapus'>Hapus</Button>
-                  </td>
+
                   {isAbsenPage && (
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">
-                    {student.pararel || '-'}
-                  </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">
+                      <span className={`inline-block px-2 py-1 border ${borderColor} rounded`}>
+                        {status}
+                      </span>
+                    </td>
                   )}
+  
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900">
+                    <Button variant="edit" className="mr-2" onClick={() => onEditStudent?.(student)}>Edit</Button>
+                    <Button variant="hapus" onClick={() => onDeleteStudent?.(student.id!)}>Hapus</Button>
+                  </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={isAbsenPage ? 7 : 8} className="px-6 py-4 text-center text-sm text-gray-500">
-                  Tidak ada data tersedia
-                </td>
-              </tr>
-            )}
-          </tbody>
+              );
+            })
+          ) : (
+            <tr>
+              <td colSpan={isAbsenPage ? 8 : 8} className="px-6 py-4 text-center text-sm text-gray-500">
+                Tidak ada data tersedia
+              </td>
+            </tr>
+          )}
+        </tbody>
+
         </table>
       </div>
 

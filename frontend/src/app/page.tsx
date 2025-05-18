@@ -241,8 +241,6 @@ export default function AttendancePage() {
       try {
         setLoading(true);
         
-        console.log("API URL:", `${baseURL}/absen`); // Debug: Log the API URL
-        
         // Menggunakan axios untuk mengambil data keseluruhan
         const response = await axios.get(`${baseURL}/absen`);      
         
