@@ -68,8 +68,10 @@ const CenterText = ({ centerX, centerY, labelTop, labelBottom }: CenterTextProps
 // Define the type for bar chart data
 type BarChartData = {
   month: string;
-  'Siswa Hadir': number;
-  'Siswa Absen': number;
+  'Hadir': number;
+  'Izin': number;
+  'Sakit': number;
+  'Alpha': number;
 };
 
 // Pie chart component
@@ -142,14 +144,14 @@ const MyResponsivePie = ({
 const MyResponsiveBar = ({ data }: MyResponsiveBarProps) => (
   <ResponsiveBar
     data={data}
-    keys={['Siswa Hadir', 'Siswa Absen']}
+    keys={['Hadir', 'Izin', 'Sakit', 'Alpha']}
     indexBy="month"
     margin={{ top: 20, right: 5, bottom: 100, left: 60 }}
     padding={0.5}
     layout="vertical"
     valueScale={{ type: 'linear' }}
     indexScale={{ type: 'band', round: true }}
-    colors={['#64B5F6', '#E57373']}
+    colors={['#22c55e', '#3b82f6', '#eab308', '#ef4444']}
     borderRadius={3}
     borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
     axisTop={null}
@@ -231,9 +233,16 @@ export default function AttendancePage() {
   const [totalAttendance, setTotalAttendance] = useState<number>(0);
   const [attendanceData, setAttendanceData] = useState<AttendanceItem[]>([]);
   
-  // Fix: Use a hardcoded API URL or properly set environment variable
-  // Option 1: Hardcoded API URL (for development)
+  // Add filter states
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [rawData, setRawData] = useState<any[]>([]);
+  
+  // Base URL
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  
+  // Month names array
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   
   // Fetch attendance data from the database
   useEffect(() => {
@@ -245,77 +254,12 @@ export default function AttendancePage() {
         const response = await axios.get(`${baseURL}/absen`);      
         
         const data = response.data.data;
-
-        // Process data for cards
-        const presentCount = data.filter((item: any) => item.status === "Hadir").length;
-        const leaveCount = data.filter((item: any) => item.status === "Izin").length;
-        const sickCount = data.filter((item: any) => item.status === "Sakit").length;
-        const absentCount = data.filter((item: any) => item.status === "Tanpa Keterangan").length;
-
-        // Calculate total students
-        const totalStudents = presentCount + leaveCount + sickCount + absentCount;
-
-        const cardData: AttendanceItem[] = [
-          { 
-            id: 1, 
-            type: "present", 
-            title: "Masuk", 
-            count: `${presentCount} Siswa`, 
-            icon: Icons.present 
-          },
-          { 
-            id: 2, 
-            type: "leave", 
-            title: "Izin", 
-            count: `${leaveCount} Siswa`, 
-            icon: Icons.leave 
-          },
-          { 
-            id: 3, 
-            type: "sick", 
-            title: "Sakit", 
-            count: `${sickCount} Siswa`, 
-            icon: Icons.sick 
-          },
-          { 
-            id: 4, 
-            type: "absent", 
-            title: "Tanpa Keterangan", 
-            count: `${absentCount} Siswa`, 
-            icon: Icons.absent 
-          },
-        ];
-
-        // Process data for pie chart
-        const chartData: PieChartDatum[] = [
-          { id: 'Hadir', label: 'Hadir', value: presentCount, color: '#64B5F6' },
-          { id: 'Izin', label: 'Izin', value: leaveCount, color: '#81C784' },
-          { id: 'Sakit', label: 'Sakit', value: sickCount, color: '#FFB74D' },
-          { id: 'Tanpa Keterangan', label: 'Tanpa Keterangan', value: absentCount, color: '#E57373' },
-        ];
         
-        // Create data for bar chart
-        // Create monthly data (using current date to show monthly attendance trends)
-        const currentDate = new Date();
-        const currentMonth = currentDate.getMonth();
-        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        // Store raw data for filtering later
+        setRawData(data);
         
-        // Create only current month data for the bar chart
-        const barChartData: BarChartData[] = [];
-        const monthName = monthNames[currentMonth];
-        
-        // Add only current month data
-        barChartData.push({
-          month: monthName,
-          'Siswa Hadir': presentCount,
-          'Siswa Absen': leaveCount + sickCount + absentCount
-        });
-        
-        // Update state
-        setAttendanceData(cardData);
-        setPieData(chartData);
-        setBarData(barChartData);
-        setTotalAttendance(totalStudents);
+        // Process data initially (full year)
+        processData(data, null, selectedYear);
     
       } catch (error) {
         console.error('Error fetching attendance data:', error);
@@ -324,22 +268,23 @@ export default function AttendancePage() {
           { id: 1, type: "present", title: "Masuk", count: "0 Siswa", icon: Icons.present },
           { id: 2, type: "leave", title: "Izin", count: "0 Siswa", icon: Icons.leave },
           { id: 3, type: "sick", title: "Sakit", count: "0 Siswa", icon: Icons.sick },
-          { id: 4, type: "absent", title: "Tanpa Keterangan", count: "0 Siswa", icon: Icons.absent },
+          { id: 4, type: "absent", title: "Alpha", count: "0 Siswa", icon: Icons.absent },
         ]);
         setPieData([
-          { id: 'Hadir', label: 'Hadir', value: 0, color: '#64B5F6' },
-          { id: 'Izin', label: 'Izin', value: 0, color: '#81C784' },
-          { id: 'Sakit', label: 'Sakit', value: 0, color: '#FFB74D' },
-          { id: 'Tanpa Keterangan', label: 'Tanpa Keterangan', value: 0, color: '#E57373' },
+          { id: 'Hadir', label: 'Hadir', value: 0, color: '#22c55e' }, // Green
+          { id: 'Izin', label: 'Izin', value: 0, color: '#3b82f6' },   // Blue
+          { id: 'Sakit', label: 'Sakit', value: 0, color: '#eab308' }, // Yellow
+          { id: 'Alpha', label: 'Alpha', value: 0, color: '#ef4444' }, // Red
         ]);
         
-        // Add fallback bar data - only current month
-        const currentMonth = new Date().getMonth();
-        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        
-        setBarData([
-          { month: monthNames[currentMonth], 'Siswa Hadir': 0, 'Siswa Absen': 0 },
-        ]);
+        // Set fallback bar data
+        setBarData(monthNames.map(month => ({ 
+          month: month, 
+          'Hadir': 0, 
+          'Izin': 0,
+          'Sakit': 0,
+          'Alpha': 0
+        })));
       } finally {
         setLoading(false);
       }
@@ -348,19 +293,177 @@ export default function AttendancePage() {
     fetchAttendanceData();
   }, []);
   
+  // Effect to reprocess data when filters change
+  useEffect(() => {
+    if (rawData.length > 0) {
+      processData(rawData, selectedMonth, selectedYear);
+    }
+  }, [selectedMonth, selectedYear]);
+  
+  // Function to process data based on filters
+  const processData = (data: any[], month: number | null, year: number) => {
+    // Filter data based on month and year
+    const filteredData = data.filter((item: any) => {
+      const itemDate = new Date(item.tanggal);
+      const itemYear = itemDate.getFullYear();
+      const itemMonth = itemDate.getMonth();
+      
+      if (month === null) {
+        // Only filter by year
+        return itemYear === year;
+      } else {
+        // Filter by both month and year
+        return itemYear === year && itemMonth === month;
+      }
+    });
+    
+    // Process data for cards
+    const presentCount = filteredData.filter((item: any) => item.status === "Hadir").length;
+    const leaveCount = filteredData.filter((item: any) => item.status === "Izin").length;
+    const sickCount = filteredData.filter((item: any) => item.status === "Sakit").length;
+    const absentCount = filteredData.filter((item: any) => item.status === "Alpha").length;
+
+    // Calculate total students
+    const totalStudents = presentCount + leaveCount + sickCount + absentCount;
+
+    const cardData: AttendanceItem[] = [
+      { 
+        id: 1, 
+        type: "present", 
+        title: "Masuk", 
+        count: `${presentCount} Siswa`, 
+        icon: Icons.present 
+      },
+      { 
+        id: 2, 
+        type: "leave", 
+        title: "Izin", 
+        count: `${leaveCount} Siswa`, 
+        icon: Icons.leave 
+      },
+      { 
+        id: 3, 
+        type: "sick", 
+        title: "Sakit", 
+        count: `${sickCount} Siswa`, 
+        icon: Icons.sick 
+      },
+      { 
+        id: 4, 
+        type: "absent", 
+        title: "Alpha", 
+        count: `${absentCount} Siswa`, 
+        icon: Icons.absent 
+      },
+    ];
+
+    // Process data for pie chart with updated colors
+    const chartData: PieChartDatum[] = [
+      { id: 'Hadir', label: 'Hadir', value: presentCount, color: '#22c55e' }, // Green
+      { id: 'Izin', label: 'Izin', value: leaveCount, color: '#3b82f6' },     // Blue
+      { id: 'Sakit', label: 'Sakit', value: sickCount, color: '#eab308' },    // Yellow
+      { id: 'Alpha', label: 'Alpha', value: absentCount, color: '#ef4444' }, // Red
+    ];
+    
+    // Create data for bar chart
+    let barChartData: BarChartData[] = [];
+    
+    if (month === null) {
+      // Show all months for the selected year
+      barChartData = monthNames.map((monthName, monthIndex) => {
+        // Filter data for each month in the selected year
+        const monthData = data.filter((item: any) => {
+          const itemDate = new Date(item.tanggal);
+          return itemDate.getFullYear() === year && itemDate.getMonth() === monthIndex;
+        });
+        
+        const monthPresent = monthData.filter((item: any) => item.status === "Hadir").length;
+        const monthLeave = monthData.filter((item: any) => item.status === "Izin").length;
+        const monthSick = monthData.filter((item: any) => item.status === "Sakit").length;
+        const monthAbsent = monthData.filter((item: any) => item.status === "Alpha").length;
+        
+        return {
+          month: monthName,
+          'Hadir': monthPresent,
+          'Izin': monthLeave,
+          'Sakit': monthSick,
+          'Alpha': monthAbsent
+        };
+      });
+    } else {
+      // Show only the selected month
+      const selectedMonthName = monthNames[month];
+      
+      barChartData = [{
+        month: selectedMonthName,
+        'Hadir': presentCount,
+        'Izin': leaveCount,
+        'Sakit': sickCount,
+        'Alpha': absentCount
+      }];
+    }
+    
+    // Update state with processed data
+    setAttendanceData(cardData);
+    setPieData(chartData);
+    setBarData(barChartData);
+    setTotalAttendance(totalStudents);
+  };
+  
+  // Handle month change
+  const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (value === "") {
+      setSelectedMonth(null);
+    } else {
+      setSelectedMonth(parseInt(value));
+    }
+  };
+  
+  // Handle year change
+  const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedYear(parseInt(e.target.value));
+  };
+  
+  // Generate array of years (current year and 3 years before)
+  const years = Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i);
+  
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
-      <Sidebar />
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Topbar */}
-        <Topbar user={{ name: "Musfiq", role: "Guru" }} />
-        {/* Page Content */}
         <main className="flex-1 p-6 overflow-y-auto">
           <div className="mx-auto my-auto bg-white rounded-xl shadow-lg p-6">
-            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
-              <h1 className="text-xl font-semibold text-gray-900">Absensi Kehadiran Keseluruhan</h1>
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 pb-4 border-b border-gray-100">
+              <h1 className="text-xl font-semibold text-gray-900 mb-4 sm:mb-0">Absensi Kehadiran Keseluruhan</h1>
+              
+              {/* Filter controls */}
+              <div className="flex space-x-4">
+                <div>
+                  <label htmlFor="month-filter" className="block text-sm font-medium text-gray-700 mb-1">Bulan</label>
+                  <select
+                    id="month-filter"
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    value={selectedMonth !== null ? selectedMonth : ""}
+                    onChange={handleMonthChange}
+                  >
+                    <option value="">Semua Bulan</option>
+                    {monthNames.map((month, index) => (
+                      <option key={month} value={index}>{month}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="year-filter" className="block text-sm font-medium text-gray-700 mb-1">Tahun</label>
+                  <select
+                    id="year-filter"
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    value={selectedYear}
+                    onChange={handleYearChange}
+                  >
+                    {years.map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
             {loading ? (
               <div className="flex justify-center items-center h-64">
@@ -382,7 +485,9 @@ export default function AttendancePage() {
                 <div className="flex flex-col md:flex-row gap-8 mt-8">
                   {/* Bar Chart */}
                   <div className="w-full md:w-[55%] h-[500px] bg-white rounded-lg p-5">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-6">Total Kehadiran Bulan Ini</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-6">
+                      Total Kehadiran {selectedMonth !== null ? monthNames[selectedMonth] : 'Tahun'} {selectedYear}
+                    </h3>
                     <div className="h-[300px] w-full">
                       {barData.length > 0 ? (
                         <MyResponsiveBar data={barData} />
@@ -395,7 +500,9 @@ export default function AttendancePage() {
                   </div>
                   {/* Pie Chart */}
                   <div className="w-full md:w-[45%] h-[500px] bg-white rounded-lg p-5">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-6">Distribusi Kehadiran</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-6">
+                      Distribusi Kehadiran {selectedMonth !== null ? monthNames[selectedMonth] : 'Tahun'} {selectedYear}
+                    </h3>
                     <div className="h-[250px] w-full">
                       <MyResponsivePie 
                         data={pieData} 
@@ -408,7 +515,5 @@ export default function AttendancePage() {
             )}
           </div>
         </main>
-      </div>
-    </div>
   );
 }

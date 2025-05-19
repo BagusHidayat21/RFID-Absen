@@ -82,6 +82,7 @@ export interface StudentTableProps {
   onItemsPerPageChange: (itemsPerPage: number) => void;
   onSearch: (query: string) => void;
   onAddStudent: () => void;
+  onDateChange?: (date: string) => void;
 }
 
 //Absensi

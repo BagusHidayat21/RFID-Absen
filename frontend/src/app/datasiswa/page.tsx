@@ -95,14 +95,7 @@ export default function Home() {
   
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
-      <Sidebar />
-
-      {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Topbar */}
-        <Topbar user={{ name: "Musfiq", role: "Guru" }} />
-
         {/* Page Content */}
         <main className="flex-1 p-6 overflow-y-auto">
           <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-6">

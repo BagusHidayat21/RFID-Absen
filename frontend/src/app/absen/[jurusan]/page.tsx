@@ -69,9 +69,6 @@ export default function JurusanDetailPage() {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <Topbar user={{ name: "Musfiq", role: "Guru" }} />
         <main className="flex-1 p-6 overflow-y-auto">
           <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-6">
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
@@ -132,6 +129,5 @@ export default function JurusanDetailPage() {
           </div>
         </main>
       </div>
-    </div>
   );
 }
