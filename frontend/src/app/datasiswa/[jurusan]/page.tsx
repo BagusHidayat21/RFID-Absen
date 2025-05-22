@@ -1,8 +1,7 @@
 'use client'
 import { useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation'; // ✅ gunakan ini di App Router
-
+import { useParams } from 'next/navigation';
 import { Class } from '@/types/index';
 import Topbar from '@/components/Header';
 import Sidebar from '@/components/Sidebar';

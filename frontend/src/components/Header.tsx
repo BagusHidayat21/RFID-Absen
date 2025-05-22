@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { TopbarProps } from "@/types/index";
 
-export default function Topbar({ user, language = "Eng (US)" }: TopbarProps) {
+export default function Topbar({ user }: TopbarProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -12,11 +12,6 @@ export default function Topbar({ user, language = "Eng (US)" }: TopbarProps) {
       <h1 className="text-xl font-semibold text-gray-800">Dashboard</h1>
 
       <div className="flex items-center gap-6">
-        <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
-          🇺🇸 <span>{language}</span>
-          <ChevronDown className="w-4 h-4" />
-        </button>
-
         <div className="relative">
           <button
             className="flex items-center gap-2 text-sm font-medium text-gray-800 hover:text-blue-600"

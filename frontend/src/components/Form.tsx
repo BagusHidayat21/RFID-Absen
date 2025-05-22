@@ -149,7 +149,7 @@ export default function StudentDataForm({ onSubmit, onCancel }: StudentDataFormP
     <div className="w-full max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-sm">
       <h1 className="text-3xl font-semibold text-center text-indigo-500 mb-6">Masukan Data Siswa</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 text-black">
         <div className="space-y-4">
           <input
             type="text"

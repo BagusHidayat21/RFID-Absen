@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Filter, ChevronDown, Search } from 'lucide-react';
 import Button from './Button';
 import { StudentTableProps } from '@/types/index';
+import Swal from 'sweetalert2';
 
 const StudentTable: React.FC<StudentTableProps> = ({
   students,
@@ -221,13 +222,34 @@ const StudentTable: React.FC<StudentTableProps> = ({
                       ) : (
                         <>
                           <Button variant="edit" className="mr-2" onClick={() => onEditStudent?.(student)}>Edit</Button>
-                          <Button variant="hapus" onClick={() => onDeleteStudent?.(student.id!)}>Hapus</Button>
+                          <Button
+                          variant="hapus"
+                          onClick={() => {
+                            Swal.fire({
+                              title: 'Apakah kamu yakin?',
+                              text: "Data siswa akan dihapus permanen!",
+                              icon: 'warning',
+                              showCancelButton: true,
+                              confirmButtonColor: '#d33',
+                              cancelButtonColor: '#3085d6',
+                              confirmButtonText: 'Ya, hapus!',
+                              cancelButtonText: 'Batal'
+                            }).then((result) => {
+                              if (result.isConfirmed) {
+                                onDeleteStudent?.(student.id!);
+                                Swal.fire('Terhapus!', 'Data siswa berhasil dihapus.', 'success');
+                              }
+                            });
+                          }}
+                        >
+                          Hapus
+                        </Button>
                         </>
                       )}
                     </td>
 
                     {isAbsenPage && (
-                      <td className="px-6 py-4 text-center text-sm text-gray-900">
+                      <td className="px-6 py-4 text-center text-sm text-gray-900">  
                         {new Date((item as typeof absensi[number]).tanggal).toISOString().substring(0, 10)}
                       </td>
                     )}

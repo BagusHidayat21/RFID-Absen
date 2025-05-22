@@ -1,9 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Sidebar from "@/components/Sidebar";
 import Card from "@/components/Card";
-import Topbar from "@/components/Header";
 import { AttendanceItem, PieChartDatum, MyResponsiveBarProps, CenterTextProps } from "@/types";
 import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
@@ -242,7 +240,7 @@ export default function AttendancePage() {
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
   
   // Month names array
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   
   // Fetch attendance data from the database
   useEffect(() => {
@@ -359,10 +357,10 @@ export default function AttendancePage() {
 
     // Process data for pie chart with updated colors
     const chartData: PieChartDatum[] = [
-      { id: 'Hadir', label: 'Hadir', value: presentCount, color: '#22c55e' }, // Green
-      { id: 'Izin', label: 'Izin', value: leaveCount, color: '#3b82f6' },     // Blue
-      { id: 'Sakit', label: 'Sakit', value: sickCount, color: '#eab308' },    // Yellow
-      { id: 'Alpha', label: 'Alpha', value: absentCount, color: '#ef4444' }, // Red
+      { id: 'Hadir', label: 'Hadir', value: presentCount, color: '#22c55e' },
+      { id: 'Izin', label: 'Izin', value: leaveCount, color: '#3b82f6' },
+      { id: 'Sakit', label: 'Sakit', value: sickCount, color: '#eab308' },
+      { id: 'Alpha', label: 'Alpha', value: absentCount, color: '#ef4444' },
     ];
     
     // Create data for bar chart
@@ -437,7 +435,7 @@ export default function AttendancePage() {
               {/* Filter controls */}
               <div className="flex space-x-4">
                 <div>
-                  <label htmlFor="month-filter" className="block text-sm font-medium text-gray-700 mb-1">Bulan</label>
+                  <label htmlFor="month-filter" className="block text-sm font-medium text-gray-700 mb-1 text-">Bulan</label>
                   <select
                     id="month-filter"
                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
