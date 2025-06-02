@@ -4,11 +4,8 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
 import { Class } from '@/types/index';
-import Topbar from '@/components/Header';
-import Sidebar from '@/components/Sidebar';
-import { IoCubeOutline } from 'react-icons/io5';
-import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
 import Jurusan from '@/components/Jurusan';
+import { BookOpen } from 'lucide-react';
 
 export default function JurusanDetailPage() {
   const params = useParams();
@@ -22,7 +19,7 @@ export default function JurusanDetailPage() {
   const [loading, setLoading] = useState(true);
 
   const Icons = {
-    all: <IoCubeOutline size={24} color="white" />
+    all: <BookOpen size={24} color="white" />
   };
 
   const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL ;
@@ -55,8 +52,7 @@ export default function JurusanDetailPage() {
   const ClassData: Class[] = [
     { id: 1, type: "n1", title: "X", icon: Icons.all, slug: "X" },
     { id: 2, type: "n2", title: "XI", icon: Icons.all, slug: "XI" },
-    { id: 3, type: "n3", title: "XII", icon: Icons.all, slug: "XII" },
-    { id: 4, type: "n4", title: "XIII", icon: Icons.all, slug: "XIII" }
+    { id: 3, type: "n3", title: "XII", icon: Icons.all, slug: "XII" }
   ];
 
   // Filter options for the dropdown
@@ -81,7 +77,7 @@ export default function JurusanDetailPage() {
                   className="flex items-center justify-between gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm w-40"
                 >
                   <span>{selectedFilter}</span>
-                  {isDropdownOpen ? <IoChevronUpOutline /> : <IoChevronDownOutline />}
+                  {isDropdownOpen ? <BookOpen /> : <BookOpen />}
                 </button>
                 
                 {isDropdownOpen && (

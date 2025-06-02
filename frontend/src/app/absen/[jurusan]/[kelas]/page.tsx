@@ -35,7 +35,17 @@ const StudentPage: React.FC = () => {
 
     const fetchAbsensi = async () => {
       try {
-        const response = await axios.get(`${baseURL}/absen`);
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+          console.error('Access token tidak ditemukan, silakan login terlebih dahulu.');
+          return;
+        }
+
+        const response = await axios.get(`${baseURL}/absen`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
         setAbsensi(response.data.data);
       } catch (error) {
         console.error("Error fetching absensi:", error);
