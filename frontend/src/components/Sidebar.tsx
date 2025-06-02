@@ -36,12 +36,12 @@ export default function Sidebar({ isMobileMenuOpen, closeMobileMenu }: SidebarPr
   ]
 
   const handleLogout = async () => {
-    const refreshToken = localStorage.getItem('refreshToken')
-    if (refreshToken) {
+    const admin_id = localStorage.getItem('id')
+    if (admin_id) {
       try {
-        await axios.post(`${baseURL}/logout`, { refreshToken })
+        await axios.post(`${baseURL}/logout`, { admin_id })
         localStorage.removeItem('refreshToken')
-        localStorage.removeItem('accessToken')
+        localStorage.clear()
         window.location.href = '/login'
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {

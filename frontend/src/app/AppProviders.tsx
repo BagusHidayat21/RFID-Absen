@@ -18,12 +18,6 @@ function isTokenExpired(token: string): boolean {
   }
 }
 
-// Fungsi cek apakah refresh token sudah expired
-function isRefreshTokenExpired(refreshToken: string): boolean {
-  // Biasanya refresh token juga JWT, jadi sama fungsi ceknya
-  return isTokenExpired(refreshToken)
-}
-
 export default function AppProviders({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -36,21 +30,36 @@ export default function AppProviders({ children }: { children: React.ReactNode }
 
   const isLoginPage = pathname === '/login'
 
-  const logout = () => {
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
-    router.push('/login')
+  const logout = async () => {
+    try {
+      const admin_id = localStorage.getItem('admin_id')
+      if (admin_id) {
+        await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/logout`, { admin_id })
+      }
+    } catch (error) {
+      console.error('Gagal logout:', error)
+    } finally {
+      localStorage.clear()
+      router.push('/login')
+    }
   }
 
-  const refreshTokens = async (refreshToken: string) => {
+
+  const refreshTokens = async () => {
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/token-refresh`, {
-        refreshToken,
-      })
-      localStorage.setItem('accessToken', response.data.accessToken)
-      localStorage.setItem('refreshToken', response.data.refreshToken)
-      return true
+      const id = localStorage.getItem('id')
+      if (!id) return false
+  
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/token-refresh`, { admin_id: id })
+  
+      if (response.status === 200 && response.data.access_token) {
+        localStorage.setItem('accessToken', response.data.access_token)
+        return true
+      } else {
+        return false
+      }
     } catch (err) {
+      console.error('Refresh token gagal:', err)
       return false
     }
   }
@@ -63,57 +72,27 @@ export default function AppProviders({ children }: { children: React.ReactNode }
 
     const validateAuth = async () => {
       const accessToken = localStorage.getItem('accessToken')
-      const refreshToken = localStorage.getItem('refreshToken')
+      const adminId = localStorage.getItem('id')
 
-      // Kalau gak ada token sama sekali
-      if (!accessToken && !refreshToken) {
-        logout()
+      if (!adminId) {
+        await logout()
         return
       }
 
-      // Cek refresh token expired, kalau expired logout langsung tanpa coba refresh
-      if (refreshToken && isRefreshTokenExpired(refreshToken)) {
-        logout()
-        return
-      }
-
-      // Jika accessToken expired, langsung coba refresh
-      if (accessToken && isTokenExpired(accessToken)) {
-        if (refreshToken) {
-          const refreshed = await refreshTokens(refreshToken)
-          if (!refreshed) {
-            logout()
-          }
-        } else {
-          logout()
-        }
-        return
-      }
-
-      // Kalau akses token valid (belum expired), tapi kita tetap refresh untuk perpanjang masa berlaku
-      if (accessToken && refreshToken) {
-        const refreshed = await refreshTokens(refreshToken)
+      if (!accessToken || isTokenExpired(accessToken)) {
+        const refreshed = await refreshTokens()
         if (!refreshed) {
-          logout()
-        }
-      }
-
-      // Jika gak ada access token tapi ada refresh token, coba refresh juga
-      if (!accessToken && refreshToken) {
-        const refreshed = await refreshTokens(refreshToken)
-        if (!refreshed) {
-          logout()
+          await logout()
+          return
         }
       }
     }
 
-    // Jalankan validasi sekali saat mount
     validateAuth().then(() => setIsAuthChecked(true))
 
-    // Set interval validasi setiap 10 menit (600000 ms)
     const interval = setInterval(() => {
       validateAuth()
-    }, 600000) // 10 menit
+    }, 600000) // tiap 10 menit
 
     return () => clearInterval(interval)
   }, [pathname, isLoginPage, router])

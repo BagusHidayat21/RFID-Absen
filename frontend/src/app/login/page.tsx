@@ -29,7 +29,6 @@ export default function LoginPage() {
     try {
       let baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
       if (!baseURL) throw new Error('API base URL belum diatur.');
-  
       if (baseURL.endsWith('/')) {
         baseURL = baseURL.slice(0, -1);
       }
@@ -51,12 +50,13 @@ export default function LoginPage() {
   
       // Ambil data sesuai struktur response baru
       const resData = response.data.data;
-      const { username, accessToken, refreshToken } = resData;
+      const {id, username, accessToken, refreshToken } = resData;
   
       if (!username || !accessToken || !refreshToken) {
         throw new Error('Data login tidak lengkap.');
       }
-  
+
+      localStorage.setItem('id', id);
       localStorage.setItem('username', username);
       localStorage.setItem('accessToken', accessToken);
   

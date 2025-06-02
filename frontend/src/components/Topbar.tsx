@@ -34,12 +34,11 @@ export default function Topbar({ isMobileMenuOpen, toggleMobileMenu }: TopbarPro
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
             <span className="text-white text-sm font-medium">{localStorage.getItem('username')?.[0]?.toUpperCase()}</span>
           </div>
-          <div className="text-left hidden sm:block">
+          <div className="text-left">
             <div className="text-sm font-medium text-gray-800">
               {localStorage.getItem('username')?.[0]?.toUpperCase()}
               {localStorage.getItem('username')?.slice(1)}
             </div>
-            <div className="text-xs text-gray-500">Guru</div>
           </div>
         </button>
       </div>

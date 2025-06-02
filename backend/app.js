@@ -11,7 +11,7 @@ const pararelRoutes = require('./src/routes/pararelRoutes');
 const jurusanRoutes = require('./src/routes/jurusanRoutes');
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
@@ -22,14 +22,13 @@ app.get('/', (req, res) => {
   res.send('🚀 API berjalan dengan baik!');
 });
 
-// Routing
-// app.use((req, res, next) => {
-//   const excludedRoutes = ['/api/login', '/api/logout', '/api/absen', '/api/absen/:id'];
-//   if (excludedRoutes.includes(req.path)) {
-//     return next();
-//   }
-//   authMiddleware(req, res, next);
-// });
+app.use((req, res, next) => {
+  const excludedRoutes = ['/api/login', '/api/logout', '/api/absen', '/api/absen/:id'];
+  if (excludedRoutes.includes(req.path)) {
+    return next();
+  }
+  authMiddleware(req, res, next);
+});
 
 app.use('/api', siswaRoutes);
 app.use('/api', absenRoutes);

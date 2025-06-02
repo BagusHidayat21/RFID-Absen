@@ -96,7 +96,7 @@ const MyResponsivePie = ({
       (props) => (
         <CenterText
           {...props}
-          labelTop="Keterangan"
+          labelTop="Total"
           labelBottom={totalAttendance}
         />
       )
@@ -105,7 +105,7 @@ const MyResponsivePie = ({
       {
         anchor: 'right',
         direction: 'column',
-        translateX: 70,
+        translateX: 85,
         itemsSpacing: 12,
         itemWidth: 80,
         itemHeight: 18,
