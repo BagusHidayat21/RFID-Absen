@@ -59,7 +59,11 @@ export default function TambahSiswaPage() {
   };
 
   const handleCancel = () => {
-    router.push('/datasiswa');
+    if (pathname.includes('/absen')) {
+      router.push('/absen');
+    } else {
+      router.push('/datasiswa');
+    }
   };
 
   return (

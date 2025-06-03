@@ -15,7 +15,7 @@ const AbsenModel = {
 
   getAllAbsen: async () => {
     try {
-      const result = await pool.query("SELECT siswa.id AS siswa_id, siswa.nama, siswa.nis, siswa.kelas_id, absensi.tanggal, absensi.jam, absensi.status, absensi.keterangan FROM absensi JOIN siswa ON absensi.siswa_id = siswa.id ORDER BY absensi.tanggal DESC;");
+      const result = await pool.query("SELECT absensi.id, siswa.id AS siswa_id, siswa.nama, siswa.nis, siswa.kelas_id, siswa.jurusan_id, siswa.pararel_id, absensi.tanggal, absensi.jam, absensi.status, absensi.keterangan FROM absensi JOIN siswa ON absensi.siswa_id = siswa.id ORDER BY absensi.tanggal DESC;");
       return result.rows;
     } catch (err) {
       throw err;

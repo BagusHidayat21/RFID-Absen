@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Filter, ChevronDown, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Filter, ChevronDown, Search, Edit, Trash } from 'lucide-react';
 import Button from './Button';
 import { StudentTableProps } from '@/types/index';
+import { on } from 'events';
 
 const StudentTable: React.FC<StudentTableProps> = ({
   students,
@@ -19,8 +20,9 @@ const StudentTable: React.FC<StudentTableProps> = ({
   onItemsPerPageChange,
   onSearch,
   onEditStudent,
-  editingStudent,
+  onEditAbsensi,
   onEditFormSubmit,
+  onEditAbsenSubmit,
   showAddButton = true,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,37 +39,46 @@ const StudentTable: React.FC<StudentTableProps> = ({
     setSelectedClass(event.target.value);
   };
 
-  // Get all available students based on the selected class filter
-  const filteredStudents = selectedClass
-    ? students.filter(student => student.pararel === selectedClass)
-    : students;
-
   const params = useParams();
   const jurusan = params?.jurusan as string;
   const kelas = params?.kelas as string;
 
-  // For the absen page, filter absensi records based on:
-  // 1. Finding the corresponding student for each absensi record
-  // 2. Filtering by the selected class (parallel)
-  // 3. Filtering by the selected date if specified
-  const filteredAbsensi = isAbsenPage
-    ? absensi.filter(absen => {
-        const student = students.find(student => student.id === absen.siswa_id);
-        
-        // Check if we have a valid student and filter by parallel class
-        if (!student) return false;
-        
-        const matchClass = selectedClass 
-          ? student.pararel === selectedClass // Use pararel for filtering, not kelas
-          : true;
-          
-        const matchDate = selectedDate 
-          ? absen.tanggal.substring(0, 10) === selectedDate 
-          : true;
-          
-        return matchClass && matchDate;
-      })
-    : [];
+  // Filter data berdasarkan halaman
+  const getFilteredData = () => {
+    let data = isAbsenPage
+      ? absensi.filter(absen => {
+          const student = students.find(student => student.id === absen.siswa_id);
+          if (!student) return false;
+  
+          const matchClass = selectedClass ? student.pararel === selectedClass : true;
+          const matchDate = selectedDate ? absen.tanggal.substring(0, 10) === selectedDate : true;
+          const matchSearch = searchQuery
+            ? student.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              student.nis.toLowerCase().includes(searchQuery.toLowerCase())
+            : true;
+  
+          return matchClass && matchDate && matchSearch;
+        })
+      : students.filter(student => {
+          const matchClass = selectedClass ? student.pararel === selectedClass : true;
+          const matchSearch = searchQuery
+            ? student.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              student.nis.toLowerCase().includes(searchQuery.toLowerCase())
+            : true;
+  
+          return matchClass && matchSearch;
+        });
+  
+    // Optional: sort by name
+    if (!isAbsenPage) {
+      data.sort((a, b) => a.nama.localeCompare(b.nama));
+    }
+  
+    return data;
+  };
+  
+
+  const filteredData = getFilteredData();
 
   useEffect(() => {
     const handleClickOutside = () => {
@@ -79,11 +90,6 @@ const StudentTable: React.FC<StudentTableProps> = ({
       document.removeEventListener('click', handleClickOutside);
     };
   }, []);
-
-  // Set data source based on page type
-  const dataSource: (typeof students[number] | typeof absensi[number])[] = isAbsenPage
-    ? filteredAbsensi
-    : filteredStudents;
 
   return (
     <div className="w-full bg-white rounded-lg shadow-sm overflow-hidden">
@@ -162,19 +168,21 @@ const StudentTable: React.FC<StudentTableProps> = ({
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">KELAS</th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">PARALLEL</th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">JURUSAN</th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {isAbsenPage ? 'STATUS' : 'AKSI'}
-              </th>
               {isAbsenPage && (
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">TANGGAL</th>
+                <>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">STATUS</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">TANGGAL</th>
+                </>
               )}
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">AKSI</th>
             </tr>
           </thead>
 
           <tbody className="bg-white divide-y divide-gray-200">
-            {dataSource.length > 0 ? (
-              dataSource.map((item, index) => {
-                // For absen page, find the corresponding student for the absensi record
+            {filteredData.length > 0 ? (
+              filteredData.map((item, index) => {
+                // Untuk halaman absen, cari data siswa berdasarkan absensi record
+                // Untuk halaman siswa, item sudah berupa data siswa
                 const student = isAbsenPage
                   ? students.find((s) => s.id === (item as any).siswa_id)
                   : (item as typeof students[number]);
@@ -183,25 +191,34 @@ const StudentTable: React.FC<StudentTableProps> = ({
 
                 let status = '-';
                 let borderColor = '';
+                let tanggal = '';
+                let absenRecord = null;
 
                 if (isAbsenPage) {
-                  status = (item as typeof absensi[number]).status;
+                  absenRecord = item as typeof absensi[number];
+                  status = absenRecord.status;
+                  tanggal = new Date(absenRecord.tanggal).toISOString().substring(0, 10);
+                  
                   switch (status) {
                     case 'Hadir':
-                      borderColor = 'border-green-500 bg-green-500 text-white'; break;
-                    case 'Alpa':
-                      borderColor = 'border-red-500 bg-red-500 text-white'; break;
+                      borderColor = 'border-green-500 bg-green-500 text-white'; 
+                      break;
+                    case 'Alpha':
+                      borderColor = 'border-red-500 bg-red-500 text-white'; 
+                      break;
                     case 'Izin':
-                      borderColor = 'border-blue-500 bg-blue-500 text-white'; break;
+                      borderColor = 'border-blue-500 bg-blue-500 text-white'; 
+                      break;
                     case 'Sakit':
-                      borderColor = 'border-yellow-500 bg-yellow-500 text-white'; break;
+                      borderColor = 'border-yellow-500 bg-yellow-500 text-white'; 
+                      break;
                     default:
-                      borderColor = 'border-red-500 bg-red-500 text-white';
+                      borderColor = 'border-gray-500 bg-gray-500 text-white';
                   }
                 }
 
                 return (
-                  <tr key={isAbsenPage ? `absen-${index}` : student.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                  <tr key={isAbsenPage ? `absen-${(item as any).id}-${index}` : student.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="px-6 py-4 text-center text-sm text-gray-900">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
@@ -212,25 +229,37 @@ const StudentTable: React.FC<StudentTableProps> = ({
                     <td className="px-6 py-4 text-center text-sm text-gray-900">{student.kelas}</td>
                     <td className="px-6 py-4 text-center text-sm text-gray-900">{student.pararel || '-'}</td>
                     <td className="px-6 py-4 text-center text-sm text-gray-900">{student.jurusan}</td>
-
-                    <td className="px-6 py-4 text-center text-sm text-gray-900">
-                      {isAbsenPage ? (
-                        <span className={`inline-block px-2 py-1 border ${borderColor} rounded`}>
-                          {status}
-                        </span>
-                      ) : (
-                        <>
-                          <Button variant="edit" className="mr-2" onClick={() => onEditStudent?.(student)}>Edit</Button>
-                          <Button variant="hapus" onClick={() => onDeleteStudent?.(student.id!)}>Hapus</Button>
-                        </>
-                      )}
-                    </td>
-
                     {isAbsenPage && (
-                      <td className="px-6 py-4 text-center text-sm text-gray-900">
-                        {new Date((item as typeof absensi[number]).tanggal).toISOString().substring(0, 10)}
-                      </td>
+                      <>
+                        <td className="px-6 py-4 text-center text-sm text-gray-900">
+                          <span className={`inline-block px-2 py-1 border ${borderColor} rounded`}>
+                            {status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center text-sm text-gray-900">
+                          {tanggal}
+                        </td>
+                      </>
                     )}
+                    <td className="px-6 py-4 text-center text-sm text-gray-900">
+                      <div className="flex items-center gap-2">
+                        {isAbsenPage ? (
+                          <Button 
+                            variant="edit" 
+                            onClick={() => onEditAbsensi (item as any)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                        ) : (
+                          <>
+                            <Button variant="edit" onClick={() => onEditStudent?.(student)}>
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button variant="hapus" onClick={() => onDeleteStudent?.(student.id!)}><Trash className="w-4 h-4" /></Button>
+                          </>
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 );
               })
@@ -248,7 +277,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
       {/* Pagination */}
       <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 sm:px-6 flex flex-col sm:flex-row justify-between items-center">
         <div className="text-sm text-gray-700 mt-2 sm:mt-0">
-          Menampilkan {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)} - {Math.min(currentPage * itemsPerPage, totalItems)} dari {totalItems} data
+          Menampilkan {Math.min(currentPage * itemsPerPage, totalItems)} dari {totalItems} data
         </div>
         <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-end">
           <div className="flex gap-2 items-center">

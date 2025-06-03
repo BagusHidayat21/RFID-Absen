@@ -76,8 +76,9 @@ export interface StudentTableProps {
   showAddButton?: boolean;
   onDeleteStudent: (id: number) => void;
   onEditStudent: (student: getStudents) => void;
-  editingStudent: getStudents | null;
+  onEditAbsensi: (absen: Absensi) => void;
   onEditFormSubmit: (editedStudent: Omit<getStudents, 'id'>) => void;
+  onEditAbsenSubmit: (editedAbsen: Omit<Absensi, 'id'>) => void;
   onPageChange: (page: number) => void;
   onItemsPerPageChange: (itemsPerPage: number) => void;
   onSearch: (query: string) => void;
@@ -92,10 +93,12 @@ export interface Absensi {
   nama: string;
   nis: string;
   kelas: string;
+  jurusan: string;
+  pararel: string;
   tanggal: string;
   jam: string;
   status: string;
-  keterangan: string | null;
+  keterangan: string;
 }
 
 // Pie Chart
@@ -126,7 +129,8 @@ export interface CenterTextProps {
 export interface StudentDataFormProps {
   onSubmit: (data: StudentFormData) => void;
   onCancel: () => void;
-  initialData?: StudentFormData; 
+  initialData?: StudentFormData, 
+  initialAbsenFormData?: AbsensFormData; 
 }
 
 export interface StudentFormData {
@@ -136,6 +140,15 @@ export interface StudentFormData {
   kelas_id: number;
   jurusan_id: number;
   pararel_id: number;
+}
+
+export interface AbsensFormData {
+  id: number;
+  siswa_id: number;
+  tanggal: string;
+  jam: string;
+  status: string;
+  keterangan: string;
 }
 
 export interface BarDatum {
