@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import StudentDataForm from '@/components/Form';
 import type { StudentFormData } from '@/types/index';
+import Swal from 'sweetalert2';
 
 export default function TambahSiswaPage() {
   const router = useRouter();
@@ -32,7 +33,16 @@ export default function TambahSiswaPage() {
         },
       });
       if (response.status === 201) {
-        router.push(`/datasiswa/${jurusan}/${kelas}`);
+        Swal.fire({
+          title: 'Berhasil!',
+          text: 'Data siswa berhasil ditambahkan',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            router.push(`/datasiswa/${jurusan}/${kelas}`);
+          }
+        });
       }
     } catch (error) {
       console.error('Error submitting form:', error);

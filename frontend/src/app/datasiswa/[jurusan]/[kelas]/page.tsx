@@ -5,6 +5,7 @@ import StudentTable from '@/components/StudentTable';
 import { useRouter, useParams } from 'next/navigation'; 
 import { getStudents, Absensi } from '@/types';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 const StudentPage: React.FC = () => {
   const router = useRouter();
@@ -117,8 +118,20 @@ const StudentPage: React.FC = () => {
     try {
       await axiosInstance.delete(`/siswa/${id}`);
       setStudents(prev => prev.filter(s => s.id !== id));
+      Swal.fire({
+        title: 'Berhasil!',
+        text: 'Data siswa berhasil dihapus',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      });
     } catch (error) {
       console.error('Error deleting student:', error);
+      Swal.fire({
+        title: 'Gagal!',
+        text: 'Gagal menghapus data siswa',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
     }
   };
 
@@ -150,8 +163,24 @@ const StudentPage: React.FC = () => {
             onDeleteStudent={handleDeleteStudent}
             onEditStudent={handleEditStudent} 
             onEditAbsensi={handleEditAbsensi}
-            onEditFormSubmit={handleAddFormSubmit}
-            onEditAbsenSubmit={handleAddAbsenSubmit}
+            onEditFormSubmit={async (newStudent) => {
+              await handleAddFormSubmit(newStudent);
+              Swal.fire({
+                title: 'Data Berhasil di Tambahkan!',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500
+              });
+            }}
+            onEditAbsenSubmit={async (newAbsen) => {
+              await handleAddAbsenSubmit(newAbsen);
+              Swal.fire({
+                title: 'Data Berhasil di Tambahkan!',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500
+              });
+            }}
             showAddButton={true}
           />
         </div>

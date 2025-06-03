@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Filter, ChevronDown, Search, Edit, Trash } from 'lucide-react';
 import Button from './Button';
 import { StudentTableProps } from '@/types/index';
-import { on } from 'events';
+import Swal from 'sweetalert2';
 
 const StudentTable: React.FC<StudentTableProps> = ({
   students,
@@ -255,7 +255,21 @@ const StudentTable: React.FC<StudentTableProps> = ({
                             <Button variant="edit" onClick={() => onEditStudent?.(student)}>
                               <Edit className="w-4 h-4" />
                             </Button>
-                            <Button variant="hapus" onClick={() => onDeleteStudent?.(student.id!)}><Trash className="w-4 h-4" /></Button>
+                            <Button variant="hapus" onClick={() => {
+                              Swal.fire({
+                                title: 'Hapus data siswa?',
+                                text: "Data akan dihapus secara permanen!",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Ya, hapus!'
+                              }).then((result) => {
+                                if (result.isConfirmed) {
+                                  onDeleteStudent?.(student.id!);
+                                }
+                              });
+                            }}><Trash className="w-4 h-4" /></Button>
                           </>
                         )}
                       </div>

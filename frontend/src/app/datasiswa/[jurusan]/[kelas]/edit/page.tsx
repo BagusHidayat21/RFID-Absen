@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import StudentDataForm from '@/components/Form';
+import Swal from 'sweetalert2';
 import type { StudentFormData } from '@/types/index';
 
 export default function TambahSiswaPage() {
@@ -39,7 +40,16 @@ export default function TambahSiswaPage() {
           },
         });
         if (response.status === 200) {
-          router.push(`/datasiswa/${jurusan}/${kelas}`);
+          Swal.fire({
+            title: 'Berhasil!',
+            text: 'Data siswa berhasil di update',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              router.push(`/datasiswa/${jurusan}/${kelas}`);
+            }
+          });
         }
       } else {
         // Jalankan POST
@@ -50,7 +60,16 @@ export default function TambahSiswaPage() {
           },
         });
         if (response.status === 201) {
-          router.push(`/datasiswa/${jurusan}/${kelas}`);
+          Swal.fire({
+            title: 'Berhasil!',
+            text: 'Data siswa berhasil di tambahkan',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              router.push(`/datasiswa/${jurusan}/${kelas}`);
+            }
+          });
         }
       }
     } catch (error) {

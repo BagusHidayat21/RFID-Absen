@@ -15,7 +15,8 @@
     "lucide-react": "^0.511.0",
     "next": "15.3.3",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "sweetalert2": "^11.6.13"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useSearchParams, usePathname } from 'next/navigation';
 import { StudentFormData, StudentDataFormProps, AbsensFormData, } from '@/types/index';
+import Swal from 'sweetalert2';
 
 interface Jurusan {
   id: number;
@@ -275,9 +276,21 @@ export default function StudentDataForm({ onSubmit, onCancel }: StudentDataFormP
     .then(res => {
       console.log('Berhasil update absen:', res.data);
       setAbsenFormData(res.data.data);
+      Swal.fire({
+        title: 'Berhasil!',
+        text: 'Data absen berhasil diupdate',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      });
     })
     .catch(err => {
       console.error('Error update absen:', err.response.data);
+      Swal.fire({
+        title: 'Gagal!',
+        text: err.response.data.message,
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
     });
   };
 
