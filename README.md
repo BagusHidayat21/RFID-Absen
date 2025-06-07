@@ -1,223 +1,236 @@
-# 📡 Sistem Absensi RFID — Kolaborasi RPL x EI
+<div align="center">
 
-Sistem Absensi Berbasis RFID ini merupakan proyek kolaborasi antara **Mahasiswa AM UM 2025** dan **SMK Negeri 1 Jenangan Ponorogo**. Tujuan dari proyek ini adalah menciptakan sistem absensi otomatis yang efisien menggunakan teknologi RFID.
+# J-TAG
 
-- 🔧 Jurusan **EI (Elektronika Industri)**: Bertanggung jawab merancang dan merakit alat RFID.
-- 💻 Jurusan **RPL (Rekayasa Perangkat Lunak)**: Bertanggung jawab mengembangkan backend (Express.js), frontend (Next.js), dan database (PostgreSQL).
+### RFID-Based Student Attendance System
+
+**Asistensi Mengajar Universitas Negeri Malang 2025**
+<br/>
+**×**
+<br/>
+**SMKN 1 Jenangan Ponorogo**
+
+<br/>
+
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-black?style=for-the-badge&logo=shadcnui&logoColor=white)
+![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)
+
+<br/>
+
+> A modern, real-time student attendance management system powered by RFID technology.
+> Built with **Next.js** and **Supabase**, J-TAG enables school staff to automatically
+> record and monitor student attendance via RFID card scanning — eliminating manual processes entirely.
+
+</div>
 
 ---
 
-## 🧠 Fitur Utama
+## Features
 
-- 🚀 Deteksi kehadiran siswa melalui kartu RFID                 
-- 💾 Penyimpanan otomatis data absensi ke database
-- 📊 Dashboard rekapitulasi kehadiran siswa
-- 📅 Riwayat absensi berdasarkan tanggal
-
----
-
-## ⚙️ Teknologi yang Digunakan
-
-- **Backend**: Node.js + Express.js
-- **Frontend**: React + Next.js + Tailwind CSS
-- **Database**: PostgreSQL
-- **Hardware**: RFID Reader + Kartu RFID
+- **Real-time RFID Scan** — Hardware attendance check-in via ESP8266 with instant duplicate detection
+- **Attendance Dashboard** — KPI cards, weekly attendance charts, recent scan activity
+- **Presensi Siswa** — Unified attendance table across all 9 jurusan with Jurusan & Tingkat filters
+- **Data Siswa** — Full student CRUD with RFID card registration
+- **Master Data** — Manage Jurusan and Kelas/Rombel master records
+- **Supabase Auth** — Secure login with session management via `@supabase/ssr`
+- **Responsive** — Mobile-first layout, tables collapse to card list on small screens
 
 ---
 
-## Prasyarat
+## Tech Stack
 
-Sebelum menginstal dan menjalankan proyek ini, pastikan Anda telah menginstal:
-
-- Node.js (versi 16.x atau lebih tinggi)
-- npm atau yarn
-- MySQL (untuk database)
-- Perangkat pembaca RFID yang kompatibel
-
-## Instalasi
-
-### 1. Kloning Repositori
-
-```bash
-git clone https://github.com/username/sistem-absensi-rfid.git
-cd sistem-absensi-rfid
-```
-
-### 2. Instalasi Backend
-
-```bash
-cd backend
-
-# Menginstal dependensi
-npm install
-
-# Menyiapkan database
-# Buat database di MySQL terlebih dahulu
-# Sesuaikan konfigurasi database di file .env
-
-# Contoh file .env:
-# DB_HOST=localhost
-# DB_USER=root
-# DB_PASS=password
-# DB_NAME=absensi_rfid
-# PORT=5000
-
-# Mengisi database dengan data awal
-npm run seed
-
-# Menjalankan server backend
-npm run dev
-```
-
-Server backend akan berjalan pada `http://localhost:5000`
-
-### 3. Instalasi Frontend
-
-```bash
-cd frontend
-
-# Menginstal dependensi
-npm install
-
-# Sesuaikan konfigurasi di file .env.local:
-# NEXT_PUBLIC_API_URL=http://localhost:5000/api
-
-# Menjalankan server frontend
-npm run dev
-```
-
-Frontend akan berjalan pada `http://localhost:3000`
-
-## Cara Penggunaan
-
-### 1. Login Admin
-
-- Buka aplikasi frontend di browser (`http://localhost:3000`)
-- Login dengan kredensial admin default:
-  - Username: admin
-  - Password: admin123
-
-### 2. Manajemen Pengguna
-
-- Masuk ke menu "Manajemen Pengguna"
-- Tambahkan data siswa, guru, atau staff
-- Kaitkan ID kartu RFID dengan pengguna yang telah ditambahkan
-
-### 3. Registrasi Kartu RFID
-
-- Hubungkan perangkat pembaca RFID ke sistem
-- Pada menu "Registrasi Kartu", tap kartu RFID pada perangkat pembaca
-- Pilih pengguna yang akan dikaitkan dengan ID kartu tersebut
-- Simpan perubahan
-
-### 4. Proses Absensi
-
-- Tempatkan perangkat pembaca RFID di lokasi yang ditentukan
-- Pengguna cukup men-tap kartu RFID mereka pada perangkat pembaca
-- Sistem akan secara otomatis mencatat waktu kehadiran
-- Notifikasi akan muncul pada layar utama untuk konfirmasi
-
-### 5. Monitoring dan Laporan
-
-- Admin dapat memantau kehadiran secara real-time melalui dashboard
-- Laporan kehadiran dapat diakses melalui menu "Laporan"
-- Pilih filter berdasarkan kelas, tanggal, atau individu
-- Ekspor laporan dalam format PDF, Excel, atau CSV
-
-## Struktur Proyek
-
-```
-sistem-absensi-rfid/
-├── backend/                 # Server Express.js
-│   ├── config/              # Konfigurasi database dan aplikasi
-│   ├── controllers/         # Controller untuk bisnis logic
-│   ├── middleware/          # Middleware aplikasi
-│   ├── models/              # Model database
-│   ├── routes/              # Definisi routing API
-│   ├── utils/               # Utilitas dan fungsi helper
-│   ├── app.js               # Aplikasi Express
-│   └── server.js            # Entry point backend
-├── frontend/                # Aplikasi Next.js
-│   ├── components/          # Komponen React
-│   ├── pages/               # Halaman Next.js
-│   ├── public/              # Asset statis
-│   ├── styles/              # File CSS/SCSS
-│   └── utils/               # Utilitas frontend
-└── docs/                    # Dokumentasi tambahan
-```
-
-## Kontribusi
-
-Kami sangat menghargai kontribusi untuk proyek ini. Berikut adalah cara untuk berkontribusi:
-
-### 1. Fork dan Clone Repositori
-
-```bash
-# Fork repositori ini terlebih dahulu melalui GitHub
-git clone https://github.com/username-anda/sistem-absensi-rfid.git
-cd sistem-absensi-rfid
-```
-
-### 2. Buat Branch Baru
-
-```bash
-git checkout -b fitur-baru
-```
-
-### 3. Lakukan Perubahan
-
-Lakukan perubahan yang diperlukan pada kode. Pastikan untuk mengikuti panduan gaya kode yang ada.
-
-### 4. Jalankan Pengujian
-
-```bash
-# Pada folder backend
-cd backend
-npm run test
-
-# Pada folder frontend
-cd frontend
-npm run test
-```
-
-### 5. Commit dan Push
-
-```bash
-git add .
-git commit -m "Menambahkan fitur baru: deskripsi singkat"
-git push origin fitur-baru
-```
-
-### 6. Buat Pull Request
-
-- Kunjungi repositori GitHub Anda
-- Klik tombol "Compare & pull request"
-- Tuliskan deskripsi perubahan yang Anda lakukan
-- Klik "Create pull request"
-
-## Panduan Kontribusi Kode
-
-- Gunakan linter untuk memastikan konsistensi kode
-- Tambahkan komentar pada kode yang kompleks
-- Tulis unit test untuk fitur baru
-- Ikuti prinsip DRY (Don't Repeat Yourself)
-- Gunakan nama variabel dan fungsi yang deskriptif
-
-## Lisensi
-
-Proyek ini dilisensikan dibawah [MIT License](LICENSE).
-
-## Tim Pengembang
-
-- Mahasiswa Angkatan Muda Universitas Negeri Malang 2025
-- Guru dan Siswa SMK Negeri 1 Jenangan Ponorogo
-
-## Kontak
-
-Untuk pertanyaan atau informasi lebih lanjut, silakan hubungi:
-- Email: admin@amumponorogo.ac.id
-- Website: https://absensi-rfid.amumponorogo.ac.id
+| Layer | Technology |
+|---|---|
+| Framework | [Next.js 15](https://nextjs.org) (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 |
+| UI Components | [shadcn/ui](https://ui.shadcn.com) (Radix UI + CVA) |
+| Data / Auth | [Supabase](https://supabase.com) (PostgreSQL, Auth, RLS) |
+| Charts | [Nivo](https://nivo.rocks) (`@nivo/bar`, `@nivo/pie`) |
+| Tables | [TanStack Table v8](https://tanstack.com/table) |
+| Notifications | [Sonner](https://sonner.emilkowal.ski) |
+| Icons | [Lucide React](https://lucide.dev) |
+| Package Manager | pnpm |
+| Runtime | Node.js v24 (via nvm) |
 
 ---
 
-© 2025 AM UM & SMKN 1 Jenangan Ponorogo. Hak Cipta Dilindungi.
+## Project Structure
+
+```
+src/
+├── app/                 # Next.js App Router pages & API routes
+│   ├── api/
+│   │   ├── rfid/        # POST/GET — RFID hardware attendance endpoint (ESP8266)
+│   │   └── latest-uid/  # GET — Latest scanned card UID polling
+│   ├── absen/           # Presensi Siswa page
+│   ├── datasiswa/       # Data Siswa CRUD pages
+│   ├── master/          # Jurusan & Kelas master data pages
+│   └── login/           # Authentication
+├── components/
+│   ├── ui/              # shadcn/ui primitives
+│   ├── shared/          # Reusable domain components (StatusBadge, etc.)
+│   ├── layouts/         # Topbar & Sidebar
+│   └── dashboard/       # Dashboard-specific presentational components
+├── features/            # Feature-scoped components & logic
+├── hooks/               # Custom hooks — data fetching, state orchestration
+├── services/            # Supabase/API data access layer (one file per domain)
+├── lib/                 # Pure utility functions — formatters, sorters, mappers
+└── types/               # Centralized TypeScript interfaces & models
+```
+
+---
+
+## API Endpoints
+
+> Server-side Next.js Route Handlers for hardware integration.
+
+### `POST /api/rfid`
+Receives RFID UID from hardware scanner and atomically records student attendance.
+
+```bash
+curl -X POST http://localhost:3000/api/rfid \
+  -H "Content-Type: application/json" \
+  -d '{"uid": "1000001"}'
+```
+
+### `GET /api/rfid?uid=<UID>`
+Alternative GET endpoint for hardware that does not support POST.
+
+```bash
+curl "http://localhost:3000/api/rfid?uid=1000001"
+```
+
+### `GET /api/latest-uid`
+Returns the most recently scanned RFID card UID — used for card registration polling.
+
+```bash
+curl http://localhost:3000/api/latest-uid
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 20+ (managed via [nvm](https://github.com/nvm-sh/nvm))
+- pnpm
+- Supabase account
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/<your-username>/rfid-absen.git
+cd rfid-absen
+```
+
+### 2. Install dependencies
+
+```bash
+pnpm install
+```
+
+### 3. Configure environment variables
+
+Create a `.env.local` file in the project root:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### 4. Set up the database
+
+Apply the database migration via Supabase SQL Editor or CLI:
+
+```bash
+supabase db push
+```
+
+The migration creates all required tables (`siswa`, `kelas`, `jurusan`, `absensi`, `latest_rfid_scan`), indexes, RLS policies, and the `record_rfid_attendance` RPC function.
+
+### 5. Run the development server
+
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## Database Schema
+
+Key tables in the `jtag` PostgreSQL schema:
+
+| Table | Description |
+|---|---|
+| `jurusan` | Department master data (9 departments: RPL, EI, OI, DPIB, TKP, TSM, TPM, TLAS, TPTUP) |
+| `kelas` | Class/Rombel master data, linked to jurusan and tingkat (X, XI, XII) |
+| `siswa` | Student records with RFID UID |
+| `absensi` | Daily attendance records with status (Hadir, Terlambat, Belum Presensi) |
+| `latest_rfid_scan` | Singleton row caching the most recently scanned card UID |
+
+### `record_rfid_attendance(p_uid text)` RPC
+
+Atomic PostgreSQL function that:
+1. Looks up the student by RFID UID
+2. Checks for duplicate attendance on the same day
+3. Determines `Hadir` or `Terlambat` based on scan time vs. 07:15 cutoff
+4. Inserts the attendance record and updates `latest_rfid_scan` in a single transaction
+
+---
+
+## Architecture
+
+```
+ESP8266 / RFID Hardware
+        │  POST /api/rfid
+        ▼
+   Next.js App Router
+   (Route Handlers)
+        │
+        ▼
+   Supabase RPC
+   record_rfid_attendance()
+        │
+        ▼
+   PostgreSQL (jtag schema)
+   + Row Level Security
+```
+
+---
+
+## Domain Reference
+
+- **Jurusan (9 departments):** RPL, EI, OI, DPIB, TKP, TSM, TPM, TLAS, TPTUP
+- **Tingkat:** X, XI, XII
+- **Attendance status:** `Hadir`, `Terlambat`, `Belum Presensi`, `Live`, `Selesai`
+- **Late threshold:** 07:15 WIB
+
+---
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit changes: `git commit -m "feat: add your feature"`
+4. Push and open a Pull Request
+
+Run TypeScript check before committing:
+
+```bash
+npx tsc --noEmit
+```
+
+---
+
+## License
+
+MIT License — © 2025 AM UM × SMKN 1 Jenangan Ponorogo
