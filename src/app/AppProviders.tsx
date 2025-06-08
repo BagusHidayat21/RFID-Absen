@@ -17,16 +17,23 @@ export default function AppProviders({ children }: { children: React.ReactNode }
   const closeMobileMenu = () => setIsMobileMenuOpen(false)
 
   const isLoginPage = pathname === '/login'
+  const isTvPage = pathname?.startsWith('/attendance/display')
+  const isPublicPage = isLoginPage || isTvPage
 
   useEffect(() => {
     let mounted = true
+
+    if (isTvPage) {
+      setIsAuthChecked(true)
+      return
+    }
 
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
 
       if (!mounted) return
 
-      if (!session && !isLoginPage) {
+      if (!session && !isPublicPage) {
         router.push('/login')
       } else if (session && isLoginPage) {
         router.push('/')
@@ -39,7 +46,7 @@ export default function AppProviders({ children }: { children: React.ReactNode }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!mounted) return
-      if (!session && !isLoginPage) {
+      if (!session && !isPublicPage) {
         router.push('/login')
       }
     })
@@ -48,9 +55,13 @@ export default function AppProviders({ children }: { children: React.ReactNode }
       mounted = false
       subscription.unsubscribe()
     }
-  }, [pathname, isLoginPage, router])
+  }, [pathname, isPublicPage, isLoginPage, isTvPage, router])
 
   if (!isAuthChecked) return null
+
+  if (isTvPage) {
+    return <div className="h-screen w-full overflow-hidden bg-slate-900">{children}</div>
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50">
@@ -66,5 +77,5 @@ export default function AppProviders({ children }: { children: React.ReactNode }
         <div className="flex-1 h-screen w-full overflow-y-auto">{children}</div>
       )}
     </div>
-  );
+  )
 }

@@ -17,6 +17,7 @@ import {
   PanelLeftClose,
   ChevronDown,
   ChevronRight,
+  Tv,
 } from 'lucide-react';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 
@@ -232,6 +233,38 @@ export function Sidebar({ isMobileMenuOpen, closeMobileMenu }: SidebarProps) {
                 </Link>
               </nav>
             )}
+          </div>
+
+          {/* Perangkat & Display */}
+          <div>
+            <p className="px-3.5 mb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              Perangkat &amp; Display
+            </p>
+            <nav className="space-y-1">
+              <Link
+                href="/settings/displays"
+                onClick={closeMobileMenu}
+                className={cn(
+                  'relative flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all group',
+                  pathname.startsWith('/settings/displays')
+                    ? 'bg-blue-50/80 text-blue-600 font-semibold'
+                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium'
+                )}
+              >
+                {pathname.startsWith('/settings/displays') && (
+                  <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-blue-600" />
+                )}
+                <div className="flex items-center space-x-3">
+                  <Tv
+                    className={cn(
+                      'w-4 h-4 transition-colors',
+                      pathname.startsWith('/settings/displays') ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-600'
+                    )}
+                  />
+                  <span>Display TV</span>
+                </div>
+              </Link>
+            </nav>
           </div>
         </div>
       </aside>

@@ -158,3 +158,49 @@ export interface BarDatum {
 export interface MyResponsiveBarProps {
   data: BarDatum[];
 }
+
+// --- TV Display System ---
+
+export interface AttendanceDisplay {
+  id: number;
+  display_code: string;
+  display_name: string;
+  location: string | null;
+  is_enabled: boolean;
+  last_seen_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TvAttendanceEvent {
+  absensi_id: number;
+  nama: string;
+  kelas: string;
+  jurusan: string;
+  pararel: string;
+  jam: string;
+  tanggal: string;
+  status: string;
+  keterangan: string;
+  code: 'ATTENDANCE_RECORDED' | 'ALREADY_ATTENDED' | 'UNREGISTERED_CARD' | 'ERROR';
+}
+
+export type TvDisplayState =
+  | { kind: 'idle' }
+  | { kind: 'success'; event: TvAttendanceEvent }
+  | { kind: 'already_recorded'; event: TvAttendanceEvent }
+  | { kind: 'unregistered' }
+  | { kind: 'error'; message: string };
+
+export interface TvDisplayConfig {
+  display_code: string;
+  display_name: string;
+  location: string | null;
+  display_id: number;
+}
+
+export interface TodaySummary {
+  hadir: number;
+  total: number;
+  belum: number;
+}
